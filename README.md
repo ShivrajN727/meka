@@ -1,19 +1,18 @@
-# meka
+# Meka
 AI Agent built for Rutgers Software Engineering Class Spring 2026
 
-# team (iteration 1)
-Requirements: Yiwen Cai, Ayomikun Kuku
+# Team (iteration 1)
+Requirements: Yiwen Cai
 Development: Shivraj Nath
 Testing: Zohaib Ahmed, Muhammad Nazir
 
 
-# metadata
+# Metadata
 Application name: meka
 Core Features for Iteration 1:
 - Landing page
 - User account creation
 - Login/Logout
-- Rutgers CAS login (Oauth/CAS)
 
 Frontend: React
 Backend: Node.js + Express
