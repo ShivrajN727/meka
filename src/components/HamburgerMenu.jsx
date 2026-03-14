@@ -1,8 +1,8 @@
 import React from 'react';
 
-const HamburgerMenu = () => {
+const HamburgerMenu = ({ onClick }) => {
   return (
-    <button className="hamburger-button" onClick={() => alert('History flyout (to be implemented)')}>
+    <button className="hamburger-button" onClick={onClick}>
       ☰
     </button>
   );
