@@ -92,3 +92,10 @@
     background-color: var(--ctp-surface1);
   }
   
+
+  .error-message {
+    color: var(--ctp-red);
+    margin-bottom: 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+  }

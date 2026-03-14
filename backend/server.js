@@ -1,8 +1,10 @@
-const express = require('express');
-const bcrypt = require('bcrypt'); 
-const db = require('./database');
-const app = express();
+import express from 'express';
+import cors from 'cors';
+import bcrypt from 'bcrypt';
+import db from './database.js';
 
+const app = express();
+app.use(cors()); 
 app.use(express.json());
 
 // Registration endpoint
@@ -14,10 +16,8 @@ app.post('/api/register', async (req, res) => {
   }
   
   try {
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    // Insert user
     db.run(
       'INSERT INTO users (username, password) VALUES (?, ?)',
       [username, hashedPassword],

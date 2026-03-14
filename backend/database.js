@@ -1,8 +1,14 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+import sqlite3 from 'sqlite3';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Connect to Database
-const dbPath = path.join(__dirname, 'meka.db');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const dbPath = process.env.NODE_ENV === 'test' 
+  ? path.join(__dirname, 'test.db') 
+  : path.join(__dirname, 'meka.db');
+
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error('Database connection error:', err.message);
@@ -11,7 +17,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
   }
 });
 
-// Users Table
+// Create users table 
 db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS users (
@@ -29,4 +35,4 @@ db.serialize(() => {
   });
 });
 
-module.exports = db;
+export default db;

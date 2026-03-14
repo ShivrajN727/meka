@@ -17,7 +17,6 @@ const Landing = () => {
 
   const toggleFlyout = () => setIsFlyoutOpen(!isFlyoutOpen);
 
-
   const openAuthModal = () => {
     console.log('openAuthModal called');
     setIsAuthModalOpen(true);
@@ -29,6 +28,11 @@ const Landing = () => {
   };
 
 
+  const handleLoginSuccess = (userData) => {
+    console.log('Login successful:', userData);
+    setIsLoggedIn(true);
+  };
+
   return (
     <div className="landing-container">
       <FlyoutPanel 
@@ -37,7 +41,11 @@ const Landing = () => {
         isLoggedIn={isLoggedIn}
         onLoginClick={openAuthModal}
       />
-      <AuthModal isOpen={isAuthModalOpen} onClose={closeAuthModal} /> 
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={closeAuthModal} 
+        onLoginSuccess={handleLoginSuccess}
+      />
       <header className="top-bar">
         <div className="top-left">
           <HamburgerMenu onClick={toggleFlyout} />
