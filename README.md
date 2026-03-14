@@ -8,16 +8,16 @@ Testing: Zohaib Ahmed, Muhammad Nazir
 
 
 # Metadata
-Application name: meka  
-Core Features for Iteration 1:
+**Application Name:** meka  
+## Core Features for Iteration 1:
 - Landing page
 - User account creation
 - Login/Logout
-
-Frontend: React  
-Backend: Node.js + Express  
-Database: SQLite or PostgreSQL  
-Testing: Jasmine, Cucumber.js, Puppeteer
+## Tech Stack
+- **Frontend:**  React  
+- **Backend:**  Node.js + Express  
+- **Database:**  SQLite or PostgreSQL  
+- **Testing:**  Jasmine, Cucumber.js, Puppeteer
 
 ## User Stories and Features
 
