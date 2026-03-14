@@ -60,14 +60,13 @@ const Landing = () => {
         </div>
 
         <div className="top-center">
-          <Greeting />
+          <Greeting username={username}/>
           <PromptInput />
         </div>
 
         <div className="top-right">
           <AccountIcon 
             onLoginClick={openAuthModal}
-            username={username}
             onLogout={handleLogout}
             isLoggedIn={isLoggedIn} 
           />
