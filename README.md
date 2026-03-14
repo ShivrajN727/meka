@@ -13,19 +13,11 @@ Testing: Zohaib Ahmed, Muhammad Nazir
 - Landing page
 - User account creation
 - Login/Logout
-<<<<<<< HEAD
-
-Frontend: React  
-Backend: Node.js + Express  
-Database: SQLite 
-Testing: Jasmine, Cucumber.js, Puppeteer
-=======
 ## Tech Stack
-- **Frontend:**  React  
-- **Backend:**  Node.js + Express  
-- **Database:**  SQLite or PostgreSQL  
-- **Testing:**  Jasmine, Cucumber.js, Puppeteer
->>>>>>> a159bcf8092cb75af779fee48811d37881cb7b0d
+- **Frontend:** React
+- **Backend:** Node.js + Express
+- **Database:** SQLite
+- **Testing:** Jasmine, Cucumber.js, Puppeteer
 
 ## User Stories and Features
 
