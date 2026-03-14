@@ -16,7 +16,7 @@ Core Features for Iteration 1:
 
 Frontend: React  
 Backend: Node.js + Express  
-Database: SQLite or PostgreSQL  
+Database: SQLite 
 Testing: Jasmine, Cucumber.js, Puppeteer
 
 ## User Stories and Features
