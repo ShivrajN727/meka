@@ -12,18 +12,16 @@ import './Landing.css';
 
 const Landing = () => {
   const [isFlyoutOpen, setIsFlyoutOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // temporary, will be replaced by auth
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false); 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [username, setUsername] = useState(''); 
 
   const toggleFlyout = () => setIsFlyoutOpen(!isFlyoutOpen);
 
   const openAuthModal = () => {
-    console.log('openAuthModal called');
     setIsAuthModalOpen(true);
   };
-  
   const closeAuthModal = () => {
-    console.log('closeAuthModal called');
     setIsAuthModalOpen(false);
   };
 
@@ -31,7 +29,15 @@ const Landing = () => {
   const handleLoginSuccess = (userData) => {
     console.log('Login successful:', userData);
     setIsLoggedIn(true);
+    setUsername(userData.username);
   };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setUsername('');
+
+    window.location.reload();
+  }
 
   return (
     <div className="landing-container">
@@ -41,23 +47,33 @@ const Landing = () => {
         isLoggedIn={isLoggedIn}
         onLoginClick={openAuthModal}
       />
+
       <AuthModal 
         isOpen={isAuthModalOpen} 
         onClose={closeAuthModal} 
         onLoginSuccess={handleLoginSuccess}
       />
+
       <header className="top-bar">
         <div className="top-left">
           <HamburgerMenu onClick={toggleFlyout} />
         </div>
+
         <div className="top-center">
           <Greeting />
           <PromptInput />
         </div>
+
         <div className="top-right">
-          <AccountIcon onLoginClick={openAuthModal} />
+          <AccountIcon 
+            onLoginClick={openAuthModal}
+            username={username}
+            onLogout={handleLogout}
+            isLoggedIn={isLoggedIn} 
+          />
         </div>
       </header>
+
       <main className="ai-output-area">
         <AIOutput />
       </main>

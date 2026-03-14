@@ -66,6 +66,32 @@ button, input, textarea {
     color: var(--ctp-blue);
     font-size: 1.2rem;
   }
+
+  /* Account icon when logged in */
+  .account-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .welcome-message {
+    color: var(--ctp-text);
+    font-size: 0.9rem;
+  }
+
+  .logout-button {
+    background-color: var(--ctp-surface0);
+    color: var(--ctp-text);
+    border: 1px solid var(--ctp-surface1);
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  .logout-button:hover {
+    background-color: var(--ctp-surface1);
+  }
   
   /* Greeting */
   .greeting {
