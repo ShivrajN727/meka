@@ -21,9 +21,7 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Registration failed');
       
-      // Registration successful – you could auto-login or just show a message
       alert('Account created! Please log in.');
-      // Optionally clear form
       setUsername('');
       setPassword('');
     } catch (err) {
@@ -45,8 +43,7 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Login failed');
       
-      // Login successful – you can close modal and update app state
-      onLoginSuccess(data); // pass user data up to parent
+      onLoginSuccess(data); 
       onClose();
     } catch (err) {
       setError(err.message);

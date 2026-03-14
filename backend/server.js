@@ -64,3 +64,5 @@ app.post('/api/login', (req, res) => {
 app.listen(3001, () => {
   console.log('Auth server running on port 3001');
 });
+
+export default app;
