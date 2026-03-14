@@ -1,9 +1,9 @@
 import React from 'react';
 
-const AccountIcon = () => {
+const AccountIcon = ({ onLoginClick }) => {
   return (
     <div className="account-icon">
-      <a href="/login">👤 Login</a> {/* placeholder icon */}
+      <button onClick={onLoginClick}>👤 Login</button>
     </div>
   );
 };

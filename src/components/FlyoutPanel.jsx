@@ -1,6 +1,6 @@
 import React from 'react';
 
-const FlyoutPanel = ({ isOpen, onClose, isLoggedIn }) => {
+const FlyoutPanel = ({ isOpen, onClose, isLoggedIn, onLoginClick }) => {
   if (!isOpen) return null; // Don't render anything if panel is closed
 
   return (
@@ -58,16 +58,19 @@ const FlyoutPanel = ({ isOpen, onClose, isLoggedIn }) => {
             </p>
             <button
               style={{
-                backgroundColor: '#cba6f7',
-                color: '#11111b',
-                border: 'none',
-                padding: '0.75rem',
-                width: '100%',
-                borderRadius: '8px',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-              }}
-              onClick={() => alert('Go to login page')}
+              backgroundColor: '#cba6f7',
+              color: '#11111b',
+              border: 'none',
+              padding: '0.75rem',
+              width: '100%',
+              borderRadius: '8px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+            }}
+            onClick={() => {
+              onClose();
+              onLoginClick();
+            }}
             >
               Log in
             </button>
