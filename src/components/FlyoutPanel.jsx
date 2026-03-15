@@ -7,6 +7,7 @@ const FlyoutPanel = ({ isOpen, onClose, isLoggedIn, onLoginClick }) => {
     <>
       {/* Overlay - covers the whole screen */}
       <div
+        data-testid="flyout-overlay"
         style={{
           position: 'fixed',
           top: 0,
