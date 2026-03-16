@@ -69,7 +69,12 @@ d. You can point to the test cases in the code repository or paste test code in 
 document.
 
 ## 6. Software Architecture and Implementation – 30%  
-a. REST API Design  
-b. Routing Table  
-c. Database Design  
+###a. REST API Design  
+| Method | Endpoint      | Description                    |
+| ------ | ------------- | ------------------------------ |
+| POST   | /api/register | Registers a new user account   |
+| POST   | /api/login    | Authenticates an existing user |
+
+###b. Routing Table  
+###c. Database Design  
 
