@@ -8,7 +8,7 @@
 | Muhammad Nazir | Testing      |
 
 ## 2. GitHub Repo Link, please make the repo public
-[Github Repository](https://github.com/ShivrajN727/meka)
+[https://github.com/ShivrajN727/meka](https://github.com/ShivrajN727/meka)
 
 The repository is public and contains the source code and documentation for Iteration 1.
 
