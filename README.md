@@ -31,3 +31,15 @@ Testing: Zohaib Ahmed, Muhammad Nazir
 
 Total effort: 2 + 3 + 3 + 1 = 9 points.  
 These stories deliver a basic interface with a landing page and user authentication.
+
+### Identified stories for Iteration 2
+| # | User Story | Function| Points Assigned |
+| - | ---------- | --------| --------------- |
+| E | As a logged-in user, I want to ask questions to the LLM, so that I can receive answers                       | Chat with LLM               | 5               |
+| F | As a logged-in user, I want my conversations to be saved automatically, so that I can review them later      | Save Conversation History   | 3               |
+| G | As a logged-in user, I want to search my previous conversations, so that I can quickly find past discussions | Search Conversation History | 4             |
+| H | As a logged-in user, I want to reopen my previous conversation, so that I can continue chatting in same thread | Continue Conversation | 3 |
+
+Total effort: 5 + 3 + 4 + 3 = 15 points.   
+These stories allow users to interact with the LLM and manage their conversation history.
+
