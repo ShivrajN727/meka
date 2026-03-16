@@ -27,10 +27,10 @@ These stories deliver a basic interface with a landing page and user authenticat
 ### Use cases and scenarios
 | Use Case | Actor | Scenario |
 |----------|------|----------|
-| View Landing Page | Visitor | The visitor opens the application and the landing page is displayed with a greeting. |
-| Register Account | New User | The user opens the authentication panel, enters username and password, the system creates a new account. |
-| Login | Registered User | The user enters credentials and the system authenticates the account and grants access to the interface. |
-| Logout | Logged-in User | The user clicks the logout button and the system ends the user session. |
+| View Landing Page | Visitor | 1. The visitor opens the application. <br> 2. The system loads the landing page. <br> 3. A greeting message and introduction to the tool are displayed. |
+| Register Account | New User |1. The user opens the authentication panel. <br> 2. The user enters a username and password. <br> 3. The system validates the input and creates a new account. |
+| Login | Registered User |1. The user enters their username and password. <br> 2. The system verifies the credentials. <br> 3. The user is granted access to the interface. |
+| Logout | Logged-in User |1. The user clicks the logout button. <br> 2. The system terminates the session and returns to the landing page. |
 
 ## 4. UI Design – 10%
 ### Pages in the System
