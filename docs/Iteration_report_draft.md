@@ -13,6 +13,7 @@
 The repository is public and contains the source code and documentation for Iteration 1.
 
 ## 3.User Stories and Features – 20%
+### User story table
 | # | User Story | Function | Points Assigned |
 |---|------------|----------|-----------------|
 | A | As a visitor, I want to see a landing page that explains the tool, so I can understand the application | Home Page | 2 |
@@ -21,7 +22,15 @@ The repository is public and contains the source code and documentation for Iter
 | D | As a logged-in user, I want to be able to log out, so that my session is securely ended | Log-Out | 1 | 
 
 Total effort: 2 + 3 + 3 + 1 = 9 points.  
-These stories deliver a basic interface with a landing page and user authentication.
+These stories deliver a basic interface with a landing page and user authentication.  
+
+### Use cases and scenarios
+| Use Case | Actor | Scenario |
+|----------|------|----------|
+| View Landing Page | Visitor | The visitor opens the application and the landing page is displayed with a greeting. |
+| Register Account | New User | The user opens the authentication panel, enters username and password, the system creates a new account. |
+| Login | Registered User | The user enters credentials and the system authenticates the account and grants access to the interface. |
+| Logout | Logged-in User | The user clicks the logout button and the system ends the user session. |
 
 ## 4. UI Design – 10%
 ### Pages in the System
