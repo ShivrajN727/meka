@@ -72,10 +72,10 @@ Unit tests are written for several UI components including AccountIcon, AuthModa
 ### c. Document how each use case/scenario is implemented via completion of a series of unit tests
 | Use Case                    | Test File            | Description                                                        |
 | --------------------------- | -------------------- | ------------------------------------------------------------------ |
-| Display greeting message    | Greeting.spec.cjs    | Verifies that the greeting displays the correct user name          |
+| Display greeting message    | Greeting.spec.cjs    | Tests if the greeting displays the correct user name          |
 | Account login/logout button | AccountIcon.spec.cjs | Tests whether the correct button appears depending on login status |
 | User authentication         | AuthModal.spec.cjs   | Tests login and registration behavior including API requests       |
-| Flyout panel interaction    | FlyoutPanel.spec.cjs | Ensures the panel opens, closes, and responds to user input        |
+| Flyout panel interaction    | FlyoutPanel.spec.cjs | Tests opening, closing, and basic user interactions with the panel        |
 
 ### d. You can point to the test cases in the code repository or paste test code in the
 document.
