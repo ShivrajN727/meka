@@ -25,6 +25,9 @@ These stories deliver a basic interface with a landing page and user authenticat
 
 ## 4. UI Design – 10%
 ### Pages in the System
+
+  ![UI Sketch](https://github.com/ShivrajN727/meka/blob/main/docs/ui-sketches/UI-sketch%20%EF%BC%881%EF%BC%89.png)
+*Figure 1: UI Wireframe sketch.
 The system contains only one page and several UI componets:
 - Landing Page/Chat Interface(Dashboard Page)
 - UI components  
@@ -32,10 +35,8 @@ The system contains only one page and several UI componets:
    2.Chat window  
    3.Prompt input panel  
    4.Authentication panel(login/ logout)  
-   5.Account Center  
-  ![UI Sketch](https://github.com/ShivrajN727/meka/blob/main/docs/ui-sketches/UI-sketch%20%EF%BC%881%EF%BC%89.png)
-*Figure 1: UI Wireframe sketch.
-
+   5.Account Center
+  
 ### Page interaction flow
 ```mermaid
 flowchart TD
