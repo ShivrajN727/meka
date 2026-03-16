@@ -27,7 +27,7 @@ These stories deliver a basic interface with a landing page and user authenticat
 ### Pages in the System
 
   ![UI Sketch](https://github.com/ShivrajN727/meka/blob/main/docs/ui-sketches/UI-sketch%20%EF%BC%881%EF%BC%89.png)
-*Figure 1: UI Wireframe sketch.
+*Figure 1: UI Wireframe sketch.  
 The system contains only one page and several UI componets:
 - Landing Page/Chat Interface(Dashboard Page)
 - UI components  
