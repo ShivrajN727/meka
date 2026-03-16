@@ -28,8 +28,7 @@ These stories deliver a basic interface with a landing page and user authenticat
 
   ![UI Sketch](https://github.com/ShivrajN727/meka/blob/main/docs/ui-sketches/UI-sketch%20%EF%BC%881%EF%BC%89.png)
 *Figure 1: UI Wireframe sketch and its UI component.*  
-The system contains a single main interface that functions as both the landing page and the chat interface (dashboard).
-The page includes several UI components that support user interaction.
+  
 The system contains a **single main interface** that functions as both the landing page and the chat interface (dashboard).  
 This interface is composed of several UI components that support user interaction.
 
