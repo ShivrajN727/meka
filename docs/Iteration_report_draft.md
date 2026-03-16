@@ -67,3 +67,8 @@ of unit tests
 d. You can point to the test cases in the code repository or paste test code in the
 document.
 
+## 6. Software Architecture and Implementation – 30%  
+a. REST API Design  
+b. Routing Table  
+c. Database Design  
+
