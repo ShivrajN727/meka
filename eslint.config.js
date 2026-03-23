@@ -6,6 +6,7 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
   globalIgnores(['dist', 'spec', '**/*.spec.cjs']),
+  //frontend
   {
     files: ['**/*.{js,jsx}'],
     extends: [
@@ -24,6 +25,16 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+    },
+  },
+])
+
+  // backend
+  {
+    files: ['backend/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      globals: globals.node,
     },
   },
 ])
