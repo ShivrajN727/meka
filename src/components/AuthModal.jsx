@@ -18,11 +18,11 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
       });
-      const data = await response.json();t('shows alert when help icon is clicked', () => {
-        render(<FlyoutPanel isOpen={true} onClose={mockOnClose} isLoggedIn={false} />);
-        fireEvent.click(screen.getByRole('button', { name: /\?/i }));
-        expect(window.alert).toHaveBeenCalledWith('Help clicked');
-      });
+      const data = await response.json();//t('shows alert when help icon is clicked', () => {
+      //  render(<FlyoutPanel isOpen={true} onClose={mockOnClose} isLoggedIn={false} />);
+      //  fireEvent.click(screen.getByRole('button', { name: /\?/i }));
+      //  expect(window.alert).toHaveBeenCalledWith('Help clicked');
+      //});
       if (!response.ok) throw new Error(data.error || 'Registration failed');
       
       alert('Account created! Please log in.');
