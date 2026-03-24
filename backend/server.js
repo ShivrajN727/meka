@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
 import db from './database.js';
+import { callLLM } from './llm.js';
 
 const app = express();
 app.use(cors()); 
@@ -61,8 +62,27 @@ app.post('/api/login', (req, res) => {
   );
 });
 
+//LLM
+app.post('/api/chat', async (req, res) => {
+  const { prompt } = req.body;
+
+  if (!prompt || prompt.trim() === '') {
+    return res.status(400).json({ error: 'Prompt is required' });
+  }
+
+  try {
+    const response = await callLLM(prompt);
+
+    res.json({ response });
+
+  } catch (err) {
+    res.status(500).json({ error: 'LLM failed' });
+  }
+});
+
 app.listen(3001, () => {
   console.log('Auth server running on port 3001');
 });
+
 
 export default app;
