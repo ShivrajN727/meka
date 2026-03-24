@@ -17,7 +17,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
   }
 });
 
-// Create users table 
+// users table 
 db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS users (
@@ -33,6 +33,23 @@ db.serialize(() => {
       console.log('Users table ready');
     }
   });
+    // message table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER,
+      prompt TEXT,
+      reply TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `, (err) => {
+    if (err) {
+      console.error('Error creating messages table:', err.message);
+    } else {
+      console.log('Messages table ready');
+    }
+  });
 });
+
 
 export default db;
