@@ -58,13 +58,13 @@ const Landing = () => {
          body: JSON.stringify({ prompt }),
         });
         const data = await res.json();
-
     //ai response
     setMessages(prev => [
       ...prev,
       { role: "ai", content: data.response }
     ]);
   } catch (err) {
+    console.error(err);
     setMessages(prev => [
       ...prev,
       { role: "ai", content: "Error getting response" }
