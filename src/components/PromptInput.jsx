@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 
-const PromptInput = () => {
-    const [prompt, setPrompt] = useState('');
+const PromptInput = ({ onSend }) => {
+  const [prompt, setPrompt] = useState('');
 
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      console.log('Prompt submitted:', prompt);
-      setPrompt('');
-    }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!prompt.trim()) return;
+
+    onSend(prompt);   //onSend
+    setPrompt('');
+  };
 
   return (
     <form onSubmit={handleSubmit} className="prompt-form">
@@ -18,7 +21,9 @@ const PromptInput = () => {
         placeholder="Ask me anything..."
         className="prompt-input"
       />
-      <button type="submit" className="prompt-submit">Send</button>
+      <button type="submit" className="prompt-submit">
+        Send
+      </button>
     </form>
   );
 };

@@ -39,6 +39,42 @@ const Landing = () => {
     window.location.reload();
   }
 
+  //input and output
+
+   const [messages, setMessages] = useState([]);
+
+   const handleSend = async (prompt) => {
+  // user message
+     setMessages(prev => [
+       ...prev,
+       { role: "user", content: prompt }
+     ]);
+     try {
+       const res = await fetch("http://localhost:3001/api/chat", {
+         method: "POST",
+         headers: {
+        "Content-Type": "application/json",
+         },
+         body: JSON.stringify({ prompt }),
+        });
+        const data = await res.json();
+    //ai response
+    setMessages(prev => [
+      ...prev,
+      { role: "ai", content: data.response }
+    ]);
+  } catch (err) {
+    console.error(err);
+    setMessages(prev => [
+      ...prev,
+      { role: "ai", content: "Error getting response" }
+    ]);
+  }
+};
+
+//
+
+
   return (
     <div className="landing-container">
       <FlyoutPanel 
@@ -61,7 +97,7 @@ const Landing = () => {
 
         <div className="top-center">
           <Greeting username={username}/>
-          <PromptInput />
+          <PromptInput onSend={handleSend} />
         </div>
 
         <div className="top-right">
@@ -73,8 +109,14 @@ const Landing = () => {
         </div>
       </header>
 
+
+
       <main className="ai-output-area">
-        <AIOutput />
+        <AIOutput messages={messages} />
+      <img 
+        src="/meka-logo-reveal-prototype.gif"
+        className="logo-bottom"
+      />
       </main>
     </div>
   );

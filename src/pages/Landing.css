@@ -143,3 +143,9 @@ button, input, textarea {
     min-height: 200px;
     color: var(--ctp-subtext1);
   }
+  .logo-bottom {
+    display: block;
+    margin: 2rem auto 0;
+    width: 180px;
+    opacity: 0.85;
+  }
