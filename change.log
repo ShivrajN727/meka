@@ -1,14 +1,12 @@
 Change Log
 
-Feature A: Home Page (Landing Page). Implemented in main branch.
+Feature A: Home Page (Landing Page).
+Feature B: Account Creation.
+Feature C: Log-In. 
+Feature D: Log-Out. 
+(Iteration 1)
 
-Feature B: Account Creation. Implemented in main branch.
-
-Feature C: Log-In. Implemented in main branch.
-
-Feature D: Log-Out. Implemented in main branch.
-
-Feature E: Chat with LLM. Planned for future iteration.
+Feature E: Chat with LLM. Implemented in #5 and merged into main branch (Mar 24, 2026).
 
 Feature F: Save Conversation History. Planned for future iteration.
 
