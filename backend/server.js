@@ -1,185 +1,73 @@
-import express from 'express';
-import cors from 'cors';
-import bcrypt from 'bcrypt';
-import db from './database.js';
-import { callLLM } from './llm.js';
+import sqlite3 from 'sqlite3';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const app = express();
-app.use(cors()); 
-app.use(express.json());
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// Registration endpoint
-app.post('/api/register', async (req, res) => {
-  const { username, password } = req.body;
-  
-  if (!username || !password) {
-    return res.status(400).json({ error: 'Username and password required' });
-  }
-  
-  try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    
-    db.run(
-      'INSERT INTO users (username, password) VALUES (?, ?)',
-      [username, hashedPassword],
-      function(err) {
-        if (err) {
-          if (err.message.includes('UNIQUE')) {
-            return res.status(409).json({ error: 'Username already exists' });
-          }
-          return res.status(500).json({ error: err.message });
-        }
-        res.status(201).json({ id: this.lastID, username });
-      }
-    );
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+const dbPath = process.env.NODE_ENV === 'test' 
+  ? path.join(__dirname, 'test.db') 
+  : path.join(__dirname, 'meka.db');
+
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error('Database connection error:', err.message);
+  } else {
+    console.log('Connected to SQLite database');
   }
 });
 
-// Login endpoint
-app.post('/api/login', (req, res) => {
-  const { username, password } = req.body;
-  
-  db.get(
-    'SELECT * FROM users WHERE username = ?',
-    [username],
-    async (err, user) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      if (!user) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-      }
-      
-      const validPassword = await bcrypt.compare(password, user.password);
-      if (!validPassword) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-      }
-      
-      res.json({ id: user.id, username: user.username });
+// Create users table 
+db.serialize(() => {
+  // Users table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `, (err) => {
+    if (err) {
+      console.error('Error creating users table:', err.message);
+    } else {
+      console.log('Users table ready');
     }
-  );
+  });
+
+  // Chat History
+  // Conversations table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS conversations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT NOT NULL,
+      title TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `, (err) => {
+    if (err) {
+      console.error('Error creating conversations table:', err.message);
+    } else {
+      console.log('Conversations table ready');
+    }
+  });
+
+  // Messages table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      conversation_id INTEGER,
+      role TEXT,
+      content TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `, (err) => {
+    if (err) {
+      console.error('Error creating messages table:', err.message);
+    } else {
+      console.log('Messages table ready');
+    }
+  });
 });
 
-//chat end point
-app.post('/api/chat', async (req, res) => {
-  const { prompt, username, conversationId, messages } = req.body;
-
-  if (!prompt) {
-    return res.status(400).json({ error: 'Prompt is required' });
-  }
-
-  try {
-    const response = await callLLM(prompt);
-
-    if (!username) {
-      return res.json({ response });
-    }
-
-    let currentConversationId = conversationId;
-
-    if (!currentConversationId) {
-      const title = prompt.slice(0, 20);
-
-      currentConversationId = await new Promise((resolve, reject) => {
-        db.run(
-          `INSERT INTO conversations (username, title) VALUES (?, ?)`,
-          [username, title],
-          function (err) {
-            if (err) return reject(err);
-            resolve(this.lastID);
-          }
-        );
-      });
-      //
-      if (messages && messages.length > 0) {
-        for (const msg of messages) {
-          await new Promise((resolve, reject) => {
-            db.run(
-              `INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?)`,
-              [currentConversationId, msg.role, msg.content],
-              (err) => (err ? reject(err) : resolve())
-            );
-          });
-        }
-      }
-    }
-    //
-    await new Promise((resolve, reject) => {
-      db.run(
-        `INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?)`,
-        [currentConversationId, 'user', prompt],
-        (err) => (err ? reject(err) : resolve())
-      );
-    });
-    await new Promise((resolve, reject) => {
-      db.run(
-        `INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?)`,
-        [currentConversationId, 'ai', response],
-        (err) => (err ? reject(err) : resolve())
-      );
-    });
-    
-    return res.json({
-      response,
-      conversationId: currentConversationId
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'LLM failed' });
-  }
-});
-
-
-//history endpoint
-app.get('/api/history', (req, res) => {
-  const { username } = req.query;
-
-  if (!username) {
-    return res.status(401).json({ error: 'Not logged in' });
-  }
-
-  db.all(
-    `SELECT id, title, created_at
-     FROM conversations
-     WHERE username = ?
-     ORDER BY created_at DESC`,
-    [username],
-    (err, rows) => {
-      if (err) {
-        console.error('DB fetch error:', err.message);
-        return res.status(500).json({ error: 'Database error' });
-      }
-
-      res.json(rows);
-    }
-  );
-});
-//conversation id
-app.get('/api/conversation/:id', (req, res) => {
-  const { id } = req.params;
-
-  db.all(
-    `SELECT role, content, created_at
-     FROM messages
-     WHERE conversation_id = ?
-     ORDER BY created_at ASC`,
-    [id],
-    (err, rows) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ error: 'Database error' });
-      }
-
-      res.json(rows);
-    }
-  );
-});
-
-app.listen(3001, () => {
-  console.log('Auth server running on port 3001');
-});
-
-
-export default app;
+export default db;
