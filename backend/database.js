@@ -39,7 +39,7 @@ db.serialize(() => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER,
       prompt TEXT,
-      reply TEXT,
+      response TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `, (err) => {
