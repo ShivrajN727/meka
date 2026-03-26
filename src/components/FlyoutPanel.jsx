@@ -2,7 +2,7 @@ import React from 'react';
 import History from './History';
 
 
-const FlyoutPanel = ({ isOpen, onClose, isLoggedIn, onLoginClick, username ,refreshHistory }) => {
+const FlyoutPanel = ({ isOpen, onClose, isLoggedIn, onLoginClick, username ,refreshHistory}) => {
   if (!isOpen) return null; // Don't render anything if panel is closed
   return (
     <>
@@ -101,8 +101,10 @@ const FlyoutPanel = ({ isOpen, onClose, isLoggedIn, onLoginClick, username ,refr
             </div>
           </>
         ) : (
-          <History username={username}
-                   refreshHistory={refreshHistory} />
+          <History 
+            username={username}
+            isOpen={isOpen}
+            refreshHistory={refreshHistory} />
           
         )}
       </div>

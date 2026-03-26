@@ -1,30 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,refreshHistory } from 'react';
 
-const History = ({ username }) => {
+const History = ({ username,isOpen }) => {
   const [history, setHistory] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!username) return;
+    if ((!username) || (!isOpen))  return;
 
     fetch(`http://localhost:3001/api/history?username=${username}`)
       .then(res => res.json())
       .then(data => {
         console.log("History API response:", data);
-
-        // 
         if (Array.isArray(data)) {
           setHistory(data);
         } else {
           setError(data.error || "Unknown error");
           setHistory([]);
-        }
-      })
+        }})
       .catch(err => {
         console.error('History load error:', err);
         setError("Network error");
-      });
-  }, [username]);
+      });  }, [isOpen,username,refreshHistory]);
 
   if (!username) {
     return <p>Please log in to view history.</p>;
@@ -49,10 +45,8 @@ const History = ({ username }) => {
             borderBottom: '1px solid #555',
           }}
         >
-          <div><strong>You:</strong> {msg.prompt}</div>
-          <div style={{ color: '#cdd6f4' }}>
-            <strong>AI:</strong> {msg.response}
-          </div>
+          <div>{msg.title}</div>
+
         </div>
       ))}
     </div>
