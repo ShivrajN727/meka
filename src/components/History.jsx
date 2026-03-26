@@ -49,6 +49,8 @@ const Section = ({
 const History = ({ username, isOpen, refreshHistory, onSelectConversation }) => {
   const [history, setHistory] = useState([]);
   const [error, setError] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [openSections, setOpenSections] = useState({
     today: true,
