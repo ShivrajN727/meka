@@ -62,22 +62,123 @@ app.post('/api/login', (req, res) => {
   );
 });
 
-//LLM
+//chat end point
 app.post('/api/chat', async (req, res) => {
-  const { prompt } = req.body;
+  const { prompt, username, conversationId, messages } = req.body;
 
-  if (!prompt || prompt.trim() === '') {
+  if (!prompt) {
     return res.status(400).json({ error: 'Prompt is required' });
   }
 
   try {
-    const response = await callLLM(prompt);
+    let currentConversationId = conversationId;
+//create conversation
+    if (username && !currentConversationId) {
+      const title = prompt || "New Chat";
 
-    res.json({ response });
+      currentConversationId = await new Promise((resolve, reject) => {
+        db.run(
+          `INSERT INTO conversations (username, title) VALUES (?, ?)`,
+          [username, title],
+          function (err) {
+            if (err) return reject(err);
+            resolve(this.lastID);
+          }
+        );
+      });
+//history message
+      if (messages && messages.length > 0) {
+        for (const msg of messages) {
+          await new Promise((resolve, reject) => {
+            db.run(
+              `INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?)`,
+              [currentConversationId, msg.role, msg.content],
+              (err) => (err ? reject(err) : resolve())
+            );
+          });
+        }
+      }
+    }
+
+ // user message]
+    if (username) {
+      await new Promise((resolve, reject) => {
+        db.run(
+          `INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?)`,
+          [currentConversationId, 'user', prompt],
+          (err) => (err ? reject(err) : resolve())
+        );
+      });
+    }
+
+//waitfor ai
+    const response = await callLLM(prompt);
+//save ai messave
+    if (username) {
+      await new Promise((resolve, reject) => {
+        db.run(
+          `INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?)`,
+          [currentConversationId, 'ai', response],
+          (err) => (err ? reject(err) : resolve())
+        );
+      });
+    }
+
+    return res.json({
+      response,
+      conversationId: currentConversationId
+    });
 
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'LLM failed' });
   }
+});
+
+
+//history endpoint
+app.get('/api/history', (req, res) => {
+  const { username } = req.query;
+
+  if (!username) {
+    return res.status(401).json({ error: 'Not logged in' });
+  }
+
+  db.all(
+    `SELECT id, title, created_at
+     FROM conversations
+     WHERE username = ?
+     ORDER BY created_at DESC`,
+    [username],
+    (err, rows) => {
+      if (err) {
+        console.error('DB fetch error:', err.message);
+        return res.status(500).json({ error: 'Database error' });
+      }
+
+      res.json(rows);
+    }
+  );
+});
+//conversation id
+app.get('/api/conversation/:id', (req, res) => {
+  const { id } = req.params;
+
+  db.all(
+    `SELECT role, content, created_at
+     FROM messages
+     WHERE conversation_id = ?
+     ORDER BY created_at ASC`,
+    [id],
+    (err, rows) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Database error' });
+      }
+
+      res.json(rows);
+    }
+  );
 });
 
 app.listen(3001, () => {

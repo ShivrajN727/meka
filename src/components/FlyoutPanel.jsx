@@ -1,8 +1,9 @@
 import React from 'react';
+import History from './History';
 
-const FlyoutPanel = ({ isOpen, onClose, isLoggedIn, onLoginClick }) => {
+
+const FlyoutPanel = ({ isOpen, onClose, isLoggedIn, onLoginClick, username ,refreshHistory}) => {
   if (!isOpen) return null; // Don't render anything if panel is closed
-
   return (
     <>
       {/* Overlay - covers the whole screen */}
@@ -100,7 +101,11 @@ const FlyoutPanel = ({ isOpen, onClose, isLoggedIn, onLoginClick }) => {
             </div>
           </>
         ) : (
-          <p>Your chat history will appear here.</p>
+          <History 
+            username={username}
+            isOpen={isOpen}
+            refreshHistory={refreshHistory} />
+          
         )}
       </div>
     </>

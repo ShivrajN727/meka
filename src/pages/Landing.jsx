@@ -15,6 +15,10 @@ const Landing = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [username, setUsername] = useState(''); 
+  const [refreshHistory, setRefreshHistory] = useState(0);
+  const [messages, setMessages] = useState([]);
+  const [conversationId, setConversationId] = useState(null);
+
 
   const toggleFlyout = () => setIsFlyoutOpen(!isFlyoutOpen);
 
@@ -26,53 +30,90 @@ const Landing = () => {
   };
 
 
-  const handleLoginSuccess = (userData) => {
-    console.log('Login successful:', userData);
-    setIsLoggedIn(true);
-    setUsername(userData.username);
-  };
+const handleLoginSuccess = async (userData) => {
+  console.log('Login successful:', userData);
+  setIsLoggedIn(true);
+  setUsername(userData.username);
+  if (!messages.length || conversationId) {
+    setRefreshHistory(prev => prev + 1)
+    return;}
+  try {
+    const res = await fetch("http://localhost:3001/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt: messages[messages.length - 1].content,
+        username: userData.username, 
+        conversationId: null,
+        messages,
+      }),
+    });
+    const data = await res.json();
+    if (data.conversationId) {
+      setConversationId(data.conversationId);
+      setRefreshHistory(prev => prev + 1);
+    }
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUsername('');
+  } catch (err) {
+    console.error("Auto save failed:", err);
+  }
+};
 
+const handleLogout = () => {
+  setIsLoggedIn(false);
+  setUsername('');
+  setConversationId(null);
+  setMessages([]);
     window.location.reload();
   }
 
-  //input and output
 
-   const [messages, setMessages] = useState([]);
 
-   const handleSend = async (prompt) => {
-  // user message
-     setMessages(prev => [
-       ...prev,
-       { role: "user", content: prompt }
-     ]);
-     try {
-       const res = await fetch("http://localhost:3001/api/chat", {
-         method: "POST",
-         headers: {
+const handleSend = async (prompt) => {
+  const newMessages = [
+    ...messages,
+    { role: "user", content: prompt }
+  ];
+
+  setMessages(newMessages);
+
+  try {
+    const body = {
+      prompt,
+      username: isLoggedIn ? username : null,
+      conversationId: isLoggedIn ? conversationId : null,
+      ...(isLoggedIn && !conversationId && { messages: newMessages }),
+    };
+    const res = await fetch("http://localhost:3001/api/chat", {
+      method: "POST",
+      headers: {
         "Content-Type": "application/json",
-         },
-         body: JSON.stringify({ prompt }),
-        });
-        const data = await res.json();
-    //ai response
+      },
+      body: JSON.stringify(body),
+    });
+    setRefreshHistory(prev => prev + 1);
+    const data = await res.json();
+
     setMessages(prev => [
       ...prev,
-      { role: "ai", content: data.response }
+      { role: "ai", content: data.response || "Error: no response" }
     ]);
+
+    if (isLoggedIn && data.conversationId && !conversationId) {
+      setConversationId(data.conversationId);
+      setRefreshHistory(prev => prev + 1);
+    }
+
   } catch (err) {
-    console.error(err);
+    console.error("Auto save failed:", err);
     setMessages(prev => [
       ...prev,
       { role: "ai", content: "Error getting response" }
     ]);
   }
 };
-
-//
 
 
   return (
@@ -82,6 +123,8 @@ const Landing = () => {
         onClose={() => setIsFlyoutOpen(false)} 
         isLoggedIn={isLoggedIn}
         onLoginClick={openAuthModal}
+        username={username}
+        refreshHistory={refreshHistory}
       />
 
       <AuthModal 
