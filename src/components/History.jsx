@@ -1,4 +1,28 @@
 import React, { useEffect, useState } from 'react';
+const Section = ({ title, items }) => {
+  if (!items || items.length === 0) return null;
+
+  return (
+    <div style={{ marginBottom: '1rem' }}>
+      <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>
+        {title}
+      </div>
+
+      {items.map(msg => (
+        <div
+          key={msg.id}
+          style={{
+            padding: '0.3rem 0',
+            cursor: 'pointer'
+          }}
+        >
+          {msg.title}
+        </div>
+      ))}
+    </div>
+  );
+};
+
 
 const History = ({ username, isOpen, refreshHistory }) => {
   const [history, setHistory] = useState([]);
@@ -35,8 +59,6 @@ const History = ({ username, isOpen, refreshHistory }) => {
     fetch(`http://localhost:3001/api/history?username=${username}`)
       .then(res => res.json())
       .then(data => {
-        console.log("History API response:", data);
-
         if (Array.isArray(data)) {
           setHistory(data);
           setError(null);
@@ -45,49 +67,15 @@ const History = ({ username, isOpen, refreshHistory }) => {
           setHistory([]);
         }
       })
-      .catch(err => {
-        console.error('History load error:', err);
+      .catch(() => {
         setError("Network error");
       });
 
   }, [isOpen, username, refreshHistory]);
 
-  // Selection
-  const Section = ({ title, items }) => {
-    if (!items || items.length === 0) return null;
-
-    return (
-      <div style={{ marginBottom: '1rem' }}>
-        <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>
-          {title}
-        </div>
-
-        {items.map(msg => (
-          <div
-            key={msg.id}
-            style={{
-              padding: '0.3rem 0',
-              cursor: 'pointer'
-            }}
-          >
-            {msg.title}
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  if (!username) {
-    return <p>Please log in to view history.</p>;
-  }
-
-  if (error) {
-    return <p style={{ color: 'red' }}>Error: {error}</p>;
-  }
-
-  if (history.length === 0) {
-    return <p>No chat history yet.</p>;
-  }
+  if (!username) return <p>Please log in to view history.</p>;
+  if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
+  if (history.length === 0) return <p>No chat history yet.</p>;
 
   const grouped = groupHistory(history);
 
