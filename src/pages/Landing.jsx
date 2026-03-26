@@ -107,6 +107,7 @@ const handleSend = async (prompt) => {
     }
 
   } catch (err) {
+    console.error("Auto save failed:", err);
     setMessages(prev => [
       ...prev,
       { role: "ai", content: "Error getting response" }
