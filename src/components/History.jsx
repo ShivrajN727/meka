@@ -1,6 +1,6 @@
-import React, { useEffect, useState,refreshHistory } from 'react';
+import React, { useEffect, useState } from 'react';
 
-const History = ({ username,isOpen }) => {
+const History = ({ username,isOpen，refreshHistory }) => {
   const [history, setHistory] = useState([]);
   const [error, setError] = useState(null);
 
