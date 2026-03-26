@@ -1,16 +1,38 @@
 import React, { useEffect, useState } from 'react';
-const Section = ({ title, items }) => {
+// lint
+const Section = ({
+  title,
+  items,
+  sectionKey,
+  isOpen,
+  toggle,
+  onSelectConversation
+}) => {
   if (!items || items.length === 0) return null;
 
   return (
     <div style={{ marginBottom: '1rem' }}>
-      <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>
+      
+      {/* title,able to fold */}
+      <div
+        onClick={() => toggle(sectionKey)}
+        style={{
+          fontWeight: 'bold',
+          marginBottom: '0.5rem',
+          cursor: 'pointer',
+          display: 'flex',
+          justifyContent: 'space-between'
+        }}
+      >
         {title}
+        <span>{isOpen ? '▼' : '▶'}</span>
       </div>
 
-      {items.map(msg => (
+      {/* content */}
+      {isOpen && items.map(msg => (
         <div
           key={msg.id}
+          onClick={() => onSelectConversation && onSelectConversation(msg.id)}
           style={{
             padding: '0.3rem 0',
             cursor: 'pointer'
@@ -24,9 +46,24 @@ const Section = ({ title, items }) => {
 };
 
 
-const History = ({ username, isOpen, refreshHistory }) => {
+const History = ({ username, isOpen, refreshHistory, onSelectConversation }) => {
   const [history, setHistory] = useState([]);
   const [error, setError] = useState(null);
+
+  const [openSections, setOpenSections] = useState({
+    today: true,
+    yesterday: true,
+    week: true,
+    month: true,
+    older: true
+  });
+
+  const toggleSection = (key) => {
+    setOpenSections(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
 
   const groupHistory = (history) => {
     const groups = {
@@ -81,11 +118,52 @@ const History = ({ username, isOpen, refreshHistory }) => {
 
   return (
     <div style={{ marginTop: '1rem', overflowY: 'auto', maxHeight: '80%' }}>
-      <Section title="Today" items={grouped.today} />
-      <Section title="Yesterday" items={grouped.yesterday} />
-      <Section title="Week" items={grouped.week} />
-      <Section title="Month" items={grouped.month} />
-      <Section title="Older" items={grouped.older} />
+      
+      <Section
+        title="Today"
+        items={grouped.today}
+        sectionKey="today"
+        isOpen={openSections.today}
+        toggle={toggleSection}
+        onSelectConversation={onSelectConversation}
+      />
+
+      <Section
+        title="Yesterday"
+        items={grouped.yesterday}
+        sectionKey="yesterday"
+        isOpen={openSections.yesterday}
+        toggle={toggleSection}
+        onSelectConversation={onSelectConversation}
+      />
+
+      <Section
+        title="Week"
+        items={grouped.week}
+        sectionKey="week"
+        isOpen={openSections.week}
+        toggle={toggleSection}
+        onSelectConversation={onSelectConversation}
+      />
+
+      <Section
+        title="Month"
+        items={grouped.month}
+        sectionKey="month"
+        isOpen={openSections.month}
+        toggle={toggleSection}
+        onSelectConversation={onSelectConversation}
+      />
+
+      <Section
+        title="Older"
+        items={grouped.older}
+        sectionKey="older"
+        isOpen={openSections.older}
+        toggle={toggleSection}
+        onSelectConversation={onSelectConversation}
+      />
+
     </div>
   );
 };
