@@ -8,7 +8,8 @@ Feature D: Log-Out.
 
 Feature E: Chat with LLM. Implemented in #5 and merged into main branch (Mar 24, 2026).
 
-Feature F: Save Conversation History. Planned for future iteration.
+Feature F: Save Conversation History. Implemented in #6 and merged into main branch(Mar 26,2026)
+Planned-UI Feature F1: Collapsible Chat History Sections
 
 Feature G: Search Conversation History. Planned for future iteration.
 
