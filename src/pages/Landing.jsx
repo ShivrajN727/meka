@@ -16,6 +16,8 @@ const Landing = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [username, setUsername] = useState(''); 
   const [refreshHistory, setRefreshHistory] = useState(0);
+  const [messages, setMessages] = useState([]);
+  const [conversationId, setConversationId] = useState(null);
 
 
   const toggleFlyout = () => setIsFlyoutOpen(!isFlyoutOpen);
@@ -67,8 +69,7 @@ const handleLogout = () => {
     window.location.reload();
   }
 
-const [messages, setMessages] = useState([]);
-const [conversationId, setConversationId] = useState(null);
+
 
 const handleSend = async (prompt) => {
   const newMessages = [
@@ -85,7 +86,6 @@ const handleSend = async (prompt) => {
       conversationId: isLoggedIn ? conversationId : null,
       ...(isLoggedIn && !conversationId && { messages: newMessages }),
     };
-
     const res = await fetch("http://localhost:3001/api/chat", {
       method: "POST",
       headers: {
@@ -93,7 +93,7 @@ const handleSend = async (prompt) => {
       },
       body: JSON.stringify(body),
     });
-
+    setRefreshHistory(prev => prev + 1);
     const data = await res.json();
 
     setMessages(prev => [
