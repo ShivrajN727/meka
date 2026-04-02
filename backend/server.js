@@ -71,7 +71,9 @@ app.post('/api/chat', async (req, res) => {
   }
 
   try {
+
     let currentConversationId = conversationId||null;
+
 //create conversation
     if (username && !currentConversationId) {
       const title = prompt || "New Chat";
