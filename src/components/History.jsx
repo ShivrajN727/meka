@@ -90,37 +90,37 @@ const History = ({ username, isOpen, refreshHistory, onSelectConversation,search
     return groups;
   };
 
-  useEffect(() => {
-    if (!username || !isOpen) return;
+useEffect(() => {
+  if (!username || !isOpen) return;
 
-    fetch(`http://localhost:3001/api/history?username=${username}`)
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          setHistory(data);
-          setError(null);
-        } else {
-          setError(data.error || "Unknown error");
-          setHistory([]);
-        }
-      })
-      .catch(() => {
-        setError("Network error");
-      });
+  const url = searchQuery
+    ? `http://localhost:3001/api/search?username=${username}&query=${searchQuery}`
+    : `http://localhost:3001/api/history?username=${username}`;
 
-  }, [isOpen, username, refreshHistory]);
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      if (Array.isArray(data)) {
+        setHistory(data);
+        setError(null);
+      } else {
+        setError(data.error || "Unknown error");
+        setHistory([]);
+      }
+    })
+    .catch(() => {
+      setError("Network error");
+    });
+
+}, [isOpen, username, refreshHistory, searchQuery]);
 
   if (!username) return <p>Please log in to view history.</p>;
   if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
   if (history.length === 0) return <p>No chat history yet.</p>;
 
-const query = (searchQuery || "").toLowerCase();
-const filteredHistory = history.filter(item =>
-  item.title.toLowerCase().includes(query)
-);
 
-  const grouped = groupHistory(filteredHistory);
-  if (searchQuery && filteredHistory.length === 0) {
+  const grouped = groupHistory(history);
+  if (searchQuery && history.length === 0) {
   return <p style={{ opacity: 0.6 }}>No matching chats</p>;
 }
   return (
