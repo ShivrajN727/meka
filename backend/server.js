@@ -165,7 +165,7 @@ app.get('/api/search', (req, res) => {
   const likeQuery = `%${query}%`;
 
   const sql = `
-    SELECT DISTINCT c.id, c.title,
+    SELECT DISTINCT c.id, c.title,c.created_at,
       CASE 
         WHEN c.title LIKE ? THEN 1
         WHEN m.content LIKE ? THEN 2
