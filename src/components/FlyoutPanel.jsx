@@ -5,6 +5,7 @@ import {useState} from 'react';
 
 const FlyoutPanel = ({ isOpen, onClose, isLoggedIn, onLoginClick, username ,refreshHistory,onOpenChat}) => {
 const [searchMode, setSearchMode] = useState(false);
+const [searchQuery, setSearchQuery] = useState("");
   if (!isOpen) return null; // Don't render anything if panel is closed
   return (
     <>
@@ -141,6 +142,8 @@ const [searchMode, setSearchMode] = useState(false);
                   type="search"
                   placeholder="Search query"
                   autoFocus
+                   value={searchQuery}
+                   onChange={(e) => setSearchQuery(e.target.value)}
                   style={{width: '100%',
                     padding: '0.75rem 0.75rem 0.75rem 2rem',
                     borderRadius: '8px',
@@ -174,6 +177,7 @@ const [searchMode, setSearchMode] = useState(false);
                    username={username}
                    isOpen={isOpen}
                    refreshHistory={refreshHistory}
+                   searchQuery={searchQuery}
                    onSelectConversation={async (id) => {
                     try {
                       const res = await fetch(`http://localhost:3001/api/conversation/${id}`);

@@ -6,7 +6,7 @@ const Section = ({
   sectionKey,
   isOpen,
   toggle,
-  onSelectConversation
+  onSelectConversation,
 }) => {
   if (!items || items.length === 0) return null;
 
@@ -46,7 +46,7 @@ const Section = ({
 };
 
 
-const History = ({ username, isOpen, refreshHistory, onSelectConversation }) => {
+const History = ({ username, isOpen, refreshHistory, onSelectConversation,searchQuery }) => {
   const [history, setHistory] = useState([]);
   const [error, setError] = useState(null);
 
@@ -114,8 +114,15 @@ const History = ({ username, isOpen, refreshHistory, onSelectConversation }) => 
   if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
   if (history.length === 0) return <p>No chat history yet.</p>;
 
-  const grouped = groupHistory(history);
+const query = (searchQuery || "").toLowerCase();
+const filteredHistory = history.filter(item =>
+  item.title.toLowerCase().includes(query)
+);
 
+  const grouped = groupHistory(filteredHistory);
+  if (searchQuery && filteredHistory.length === 0) {
+  return <p style={{ opacity: 0.6 }}>No matching chats</p>;
+}
   return (
     <div style={{ marginTop: '1rem', overflowY: 'auto', maxHeight: '80%' }}>
       
