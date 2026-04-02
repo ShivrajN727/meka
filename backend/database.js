@@ -17,7 +17,9 @@ const db = new sqlite3.Database(dbPath, (err) => {
   }
 });
 
-// users table 
+db.run('PRAGMA foreign_keys = ON');
+
+// Create all required tables
 db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS users (
@@ -27,29 +29,35 @@ db.serialize(() => {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `, (err) => {
-    if (err) {
-      console.error('Error creating table:', err.message);
-    } else {
-      console.log('Users table ready');
-    }
+    if (err) console.error('Error creating users table:', err.message);
+    else console.log('Users table ready');
   });
-    // message table
+
   db.run(`
-    CREATE TABLE IF NOT EXISTS messages (
+    CREATE TABLE IF NOT EXISTS conversations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER,
-      prompt TEXT,
-      response TEXT,
+      username TEXT NOT NULL,
+      title TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `, (err) => {
-    if (err) {
-      console.error('Error creating messages table:', err.message);
-    } else {
-      console.log('Messages table ready');
-    }
+    if (err) console.error('Error creating conversations table:', err.message);
+    else console.log('Conversations table ready');
+  });
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      conversation_id INTEGER NOT NULL,
+      role TEXT NOT NULL,
+      content TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE
+    )
+  `, (err) => {
+    if (err) console.error('Error creating messages table:', err.message);
+    else console.log('Messages table ready');
   });
 });
-
 
 export default db;
