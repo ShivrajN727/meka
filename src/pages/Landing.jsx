@@ -38,30 +38,33 @@ const handleLoginSuccess = async (userData) => {
   console.log('Login successful:', userData);
   setIsLoggedIn(true);
   setUsername(userData.username);
+
   if (!messages.length || conversationId) {
-    setRefreshHistory(prev => prev + 1)
-    return;}
+    setRefreshHistory(prev => prev + 1);
+    return;
+  }
+
   try {
-    const res = await fetch("http://localhost:3001/api/chat", {
+    const res = await fetch("http://localhost:3001/api/conversation", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        prompt: messages[messages.length - 1].content,
-        username: userData.username, 
-        conversationId: null,
+        username: userData.username,
         messages,
       }),
     });
+
     const data = await res.json();
+
     if (data.conversationId) {
       setConversationId(data.conversationId);
       setRefreshHistory(prev => prev + 1);
     }
 
   } catch (err) {
-    console.error("Auto save failed:", err);
+    console.error("Save failed:", err);
   }
 };
 
@@ -88,7 +91,7 @@ const handleSend = async (prompt) => {
       prompt,
       username: isLoggedIn ? username : null,
       conversationId: isLoggedIn ? conversationId : null,
-      ...(isLoggedIn && !conversationId && { messages: newMessages }),
+      ...(isLoggedIn && !conversationId && { messages: messages }),
     };
     const res = await fetch("http://localhost:3001/api/chat", {
       method: "POST",
