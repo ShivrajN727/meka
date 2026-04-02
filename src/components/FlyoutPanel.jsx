@@ -3,8 +3,8 @@ import History from './History';
 import {useState} from 'react';
 
 
-const FlyoutPanel = ({ isOpen, onClose, isLoggedIn, onLoginClick, username ,refreshHistory}) => {
-  const [searchMode, setSearchMode] = useState(false);
+const FlyoutPanel = ({ isOpen, onClose, isLoggedIn, onLoginClick, username ,refreshHistory,onOpenChat}) => {
+const [searchMode, setSearchMode] = useState(false);
   if (!isOpen) return null; // Don't render anything if panel is closed
   return (
     <>
@@ -117,7 +117,9 @@ const FlyoutPanel = ({ isOpen, onClose, isLoggedIn, onLoginClick, username ,refr
               width: searchMode ? '50px' : '70%',
               transition: 'all 0.25s ease',
             }}
-            onClick={onClose}
+            onClick={() => {onOpenChat({messages: [],conversationId: null});
+              onClose();
+            }}
             >
               {searchMode ? '+' : '+ NEW CHAT'}
               </button>
@@ -144,6 +146,8 @@ const FlyoutPanel = ({ isOpen, onClose, isLoggedIn, onLoginClick, username ,refr
                     borderRadius: '8px',
                     border: 'none',
                     outline: 'none',
+                    backgroundColor: '#2b2b2b',
+                    color: 'white',
                     cursor: 'text',
                   }}
                    onBlur={() => setSearchMode(false)}
@@ -152,7 +156,7 @@ const FlyoutPanel = ({ isOpen, onClose, isLoggedIn, onLoginClick, username ,refr
                    ) : (
                    <button
                    style={{backgroundColor: '#4f4f4f',
-                    color: '#ffffff',
+                    color: '#ffffffbd',
                     border: 'none',
                     padding: '0.75rem',
                     width: '50px',
@@ -169,7 +173,26 @@ const FlyoutPanel = ({ isOpen, onClose, isLoggedIn, onLoginClick, username ,refr
               < History 
                    username={username}
                    isOpen={isOpen}
-                   refreshHistory={refreshHistory} />
+                   refreshHistory={refreshHistory}
+                   onSelectConversation={async (id) => {
+                    try {
+                      const res = await fetch(`http://localhost:3001/api/conversation/${id}`);
+                      const raw = await res.json();
+                      const cleanedMessages = raw
+                      .slice(1)
+                      .map(msg => ({
+                        role: msg.role,
+                        content: msg.content}));
+                      onOpenChat({
+                        messages: cleanedMessages,
+                        conversationId: id
+                      });
+                      onClose();
+                    } catch (err) {
+                      console.error("Failed to load conversation", err);
+                    }
+                  }}
+                    />
             </div>
           </>
         )}
