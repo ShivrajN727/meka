@@ -154,6 +154,41 @@ app.post('/api/conversation', (req, res) => {
   );
 });
 
+//search endpoint
+app.get('/api/search', (req, res) => {
+  const { username, query } = req.query;
+
+  if (!username || !query) {
+    return res.status(400).json({ error: 'Missing params' });
+  }
+
+  const likeQuery = `%${query}%`;
+
+  const sql = `
+    SELECT DISTINCT c.id, c.title,
+      CASE 
+        WHEN c.title LIKE ? THEN 1
+        WHEN m.content LIKE ? THEN 2
+        ELSE 3
+      END as priority
+    FROM conversations c
+    LEFT JOIN messages m ON c.id = m.conversation_id
+    WHERE c.username = ?
+      AND (c.title LIKE ? OR m.content LIKE ?)
+    ORDER BY priority ASC, c.created_at DESC
+  `;
+
+  db.all(sql, [
+    likeQuery,        // title priority
+    likeQuery,        // message priority
+    username,
+    likeQuery,
+    likeQuery
+  ], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
 
 
 //history endpoint
@@ -180,6 +215,8 @@ app.get('/api/history', (req, res) => {
     }
   );
 });
+
+
 //conversation id
 app.get('/api/conversation/:id', (req, res) => {
   const { id } = req.params;
