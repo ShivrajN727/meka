@@ -19,6 +19,10 @@ const Landing = () => {
   const [messages, setMessages] = useState([]);
   const [conversationId, setConversationId] = useState(null);
 
+  const openChat = ({ messages, conversationId }) => {
+  setMessages(messages);
+  setConversationId(conversationId);
+};
 
   const toggleFlyout = () => setIsFlyoutOpen(!isFlyoutOpen);
 
@@ -95,7 +99,6 @@ const handleSend = async (prompt) => {
     });
     setRefreshHistory(prev => prev + 1);
     const data = await res.json();
-
     setMessages(prev => [
       ...prev,
       { role: "ai", content: data.response || "Error: no response" }
@@ -125,6 +128,7 @@ const handleSend = async (prompt) => {
         onLoginClick={openAuthModal}
         username={username}
         refreshHistory={refreshHistory}
+        onOpenChat={openChat}
       />
 
       <AuthModal 
@@ -151,9 +155,7 @@ const handleSend = async (prompt) => {
           />
         </div>
       </header>
-
-
-
+      {/*AI OUTPUT*/}
       <main className="ai-output-area">
         <AIOutput messages={messages} />
       <img 
@@ -166,3 +168,4 @@ const handleSend = async (prompt) => {
 };
 
 export default Landing;
+
