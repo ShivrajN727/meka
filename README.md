@@ -13,6 +13,13 @@ Testing: Zohaib Ahmed, Muhammad Nazir
 - Landing page
 - User account creation
 - Login/Logout
+
+## Core Features for Iteration 2:
+- Chat Interface
+- Fly out panel  
+- Conversation History  
+- Search box
+
 ## Tech Stack
 - **Frontend:** React
 - **Backend:** Node.js + Express
@@ -32,6 +39,7 @@ Testing: Zohaib Ahmed, Muhammad Nazir
 Total effort: 2 + 3 + 3 + 1 = 9 points.  
 These stories deliver a basic interface with a landing page and user authentication.
 
+### Identified Stories for Iteration 2
 | #  | User Story                                                                                                                 | Function                  | Points |
 | -- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------- | ------ |
 | E1 | As a user, I want to enter a prompt in a chat input box, so that I can send a question to the LLM                          | Send Prompt               | 2      |
