@@ -66,14 +66,12 @@ app.post('/api/login', (req, res) => {
 app.post('/api/chat', async (req, res) => {
   const { prompt, username, conversationId, messages } = req.body;
 
-  if (!prompt) {
+  if (!prompt&& (!messages || messages.length === 0)) {
     return res.status(400).json({ error: 'Prompt is required' });
   }
 
   try {
-
-    let currentConversationId = conversationId||null;
-
+    let currentConversationId = conversationId || null;
 //create conversation
     if (username && !currentConversationId) {
       const title = prompt || "New Chat";
@@ -88,18 +86,6 @@ app.post('/api/chat', async (req, res) => {
           }
         );
       });
-//history message
-      if (messages && messages.length > 0) {
-        for (const msg of messages) {
-          await new Promise((resolve, reject) => {
-            db.run(
-              `INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?)`,
-              [currentConversationId, msg.role, msg.content],
-              (err) => (err ? reject(err) : resolve())
-            );
-          });
-        }
-      }
     }
 
  // user message]
@@ -136,6 +122,38 @@ app.post('/api/chat', async (req, res) => {
     res.status(500).json({ error: 'LLM failed' });
   }
 });
+
+//conversation sync
+app.post('/api/conversation', (req, res) => {
+  const { username, messages } = req.body;
+
+  if (!username || !messages || messages.length === 0) {
+    return res.status(400).json({ error: 'Missing data' });
+  }
+
+  db.run(
+    `INSERT INTO conversations (username, title) VALUES (?, ?)`,
+    [username, "New Chat"],
+    function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+
+      const conversationId = this.lastID;
+
+      const stmt = db.prepare(
+        `INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?)`
+      );
+
+      for (const msg of messages) {
+        stmt.run(conversationId, msg.role, msg.content);
+      }
+
+      stmt.finalize();
+
+      res.json({ conversationId });
+    }
+  );
+});
+
 
 
 //history endpoint
