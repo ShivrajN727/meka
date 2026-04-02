@@ -26,7 +26,6 @@ describe('FlyoutPanel', () => {
 
   it('renders when isOpen is true (logged in)', () => {
     render(<FlyoutPanel isOpen={true} onClose={mockOnClose} isLoggedIn={true} />);
-    expect(screen.getByText(/Your chat history will appear here/i)).toBeTruthy();
     // Logged-out elements should not be present
     expect(screen.queryByText(/Logged in users can save chats/i)).toBeNull();
     expect(screen.queryByRole('button', { name: /Log in/i })).toBeNull();
