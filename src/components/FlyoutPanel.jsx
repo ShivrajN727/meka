@@ -1,8 +1,11 @@
 import React from 'react';
 import History from './History';
+import {useState} from 'react';
 
 
-const FlyoutPanel = ({ isOpen, onClose, isLoggedIn, onLoginClick, username ,refreshHistory}) => {
+const FlyoutPanel = ({ isOpen, onClose, isLoggedIn, onLoginClick, username ,refreshHistory,onOpenChat}) => {
+const [searchMode, setSearchMode] = useState(false);
+const [searchQuery, setSearchQuery] = useState("");
   if (!isOpen) return null; // Don't render anything if panel is closed
   return (
     <>
@@ -100,14 +103,104 @@ const FlyoutPanel = ({ isOpen, onClose, isLoggedIn, onLoginClick, username ,refr
               </button>
             </div>
           </>
-        ) : (
-          <History 
-            username={username}
-            isOpen={isOpen}
-            refreshHistory={refreshHistory} />
-          
+        ):(
+          <>
+           <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+            {/* NEW CHAT */}
+            <button
+            style={{
+              backgroundColor: '#11111b',
+              color: '#cba6f7',
+              border: 'none',
+              padding: '0.75rem',borderRadius: '8px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              width: searchMode ? '50px' : '70%',
+              transition: 'all 0.25s ease',
+            }}
+            onClick={() => {onOpenChat({messages: [],conversationId: null});
+              onClose();
+            }}
+            >
+              {searchMode ? '+' : '+ NEW CHAT'}
+              </button>
+              {/* SEARCH*/}
+               {searchMode ? (
+                <div style={{ position: 'relative', flex: 1 }}>
+                  {/* 🔍 icon inside */}
+                  <span
+                  style={{
+                    position: 'absolute',
+                    left: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    pointerEvents: 'none',
+                  }}
+                  >🔍
+                  </span>
+                  <input
+                  type="search"
+                  placeholder="Search query"
+                  autoFocus
+                   value={searchQuery}
+                   onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{width: '100%',
+                    padding: '0.75rem 0.75rem 0.75rem 2rem',
+                    borderRadius: '8px',
+                    border: 'none',
+                    outline: 'none',
+                    backgroundColor: '#2b2b2b',
+                    color: 'white',
+                    cursor: 'text',
+                  }}
+                   onBlur={() => setSearchMode(false)}
+                   />
+                   </div>
+                   ) : (
+                   <button
+                   style={{backgroundColor: '#4f4f4f',
+                    color: '#ffffffbd',
+                    border: 'none',
+                    padding: '0.75rem',
+                    width: '50px',
+                    borderRadius: '8px',
+                    cursor: 'text',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onClick={() => setSearchMode(true)}
+                  >🔍
+                  </button>
+                )}
+                </div>                    
+             <div>
+              < History 
+                   username={username}
+                   isOpen={isOpen}
+                   refreshHistory={refreshHistory}
+                   searchQuery={searchQuery}
+                   onSelectConversation={async (id) => {
+                    try {
+                      const res = await fetch(`http://localhost:3001/api/conversation/${id}`);
+                      const raw = await res.json();
+                      const cleanedMessages = raw
+                      .slice(1)
+                      .map(msg => ({
+                        role: msg.role,
+                        content: msg.content}));
+                      onOpenChat({
+                        messages: cleanedMessages,
+                        conversationId: id
+                      });
+                      onClose();
+                    } catch (err) {
+                      console.error("Failed to load conversation", err);
+                    }
+                  }}
+                    />
+            </div>
+          </>
         )}
-      </div>
+     </div>
     </>
   );
 };

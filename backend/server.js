@@ -66,7 +66,7 @@ app.post('/api/login', (req, res) => {
 app.post('/api/chat', async (req, res) => {
   const { prompt, username, conversationId, messages } = req.body;
 
-  if (!prompt) {
+  if (!prompt&& (!messages || messages.length === 0)) {
     return res.status(400).json({ error: 'Prompt is required' });
   }
 
@@ -86,18 +86,6 @@ app.post('/api/chat', async (req, res) => {
           }
         );
       });
-//history message
-      if (messages && messages.length > 0) {
-        for (const msg of messages) {
-          await new Promise((resolve, reject) => {
-            db.run(
-              `INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?)`,
-              [currentConversationId, msg.role, msg.content],
-              (err) => (err ? reject(err) : resolve())
-            );
-          });
-        }
-      }
     }
 
  // user message]
@@ -135,6 +123,73 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
+//conversation sync
+app.post('/api/conversation', (req, res) => {
+  const { username, messages } = req.body;
+
+  if (!username || !messages || messages.length === 0) {
+    return res.status(400).json({ error: 'Missing data' });
+  }
+
+  db.run(
+    `INSERT INTO conversations (username, title) VALUES (?, ?)`,
+    [username, "New Chat"],
+    function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+
+      const conversationId = this.lastID;
+
+      const stmt = db.prepare(
+        `INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?)`
+      );
+
+      for (const msg of messages) {
+        stmt.run(conversationId, msg.role, msg.content);
+      }
+
+      stmt.finalize();
+
+      res.json({ conversationId });
+    }
+  );
+});
+
+//search endpoint
+app.get('/api/search', (req, res) => {
+  const { username, query } = req.query;
+
+  if (!username || !query) {
+    return res.status(400).json({ error: 'Missing params' });
+  }
+
+  const likeQuery = `%${query}%`;
+
+  const sql = `
+    SELECT DISTINCT c.id, c.title,c.created_at,
+      CASE 
+        WHEN c.title LIKE ? THEN 1
+        WHEN m.content LIKE ? THEN 2
+        ELSE 3
+      END as priority
+    FROM conversations c
+    LEFT JOIN messages m ON c.id = m.conversation_id
+    WHERE c.username = ?
+      AND (c.title LIKE ? OR m.content LIKE ?)
+    ORDER BY priority ASC, c.created_at DESC
+  `;
+
+  db.all(sql, [
+    likeQuery,        // title priority
+    likeQuery,        // message priority
+    username,
+    likeQuery,
+    likeQuery
+  ], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
+
 
 //history endpoint
 app.get('/api/history', (req, res) => {
@@ -160,6 +215,8 @@ app.get('/api/history', (req, res) => {
     }
   );
 });
+
+
 //conversation id
 app.get('/api/conversation/:id', (req, res) => {
   const { id } = req.params;
