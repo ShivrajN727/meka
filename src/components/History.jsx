@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 // lint
+
 const Section = ({
   title,
   items,
@@ -8,6 +9,22 @@ const Section = ({
   toggle,
   onSelectConversation,
 }) => {
+const [activeId, setActiveId] = useState(null);
+const [hoverId, setHoverId] = useState(null);
+const formatDate = (dateStr) => {
+const date = new Date(dateStr);
+const now = new Date();
+const diff = (now - date) / (1000 * 60 * 60 * 24);
+
+  if (diff < 1) {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  } else if (diff < 7) {
+    return date.toLocaleDateString([], { weekday: 'short' });
+  } else {
+    return date.toLocaleDateString();
+  }
+};
+  
   if (!items || items.length === 0) return null;
 
   return (
@@ -29,18 +46,60 @@ const Section = ({
       </div>
 
       {/* content */}
-      {isOpen && items.map(msg => (
-        <div
-          key={msg.id}
-          onClick={() => onSelectConversation && onSelectConversation(msg.id)}
-          style={{
-            padding: '0.3rem 0',
-            cursor: 'pointer'
-          }}
-        >
-          {msg.title}
-        </div>
-      ))}
+{isOpen && items.map(msg => (
+  <div
+    key={msg.id}
+
+    onClick={() => {
+      setActiveId(msg.id);
+      onSelectConversation && onSelectConversation(msg.id);
+    }}
+
+    onMouseEnter={() => setHoverId(msg.id)}
+    onMouseLeave={() => setHoverId(null)}
+
+    style={{
+      padding: '0.4rem 0.6rem',
+      cursor: 'pointer',
+      borderRadius: '6px',
+      transition: 'background 0.2s ease',
+
+      display: 'flex',                 
+      justifyContent: 'space-between', 
+      alignItems: 'center',
+
+      backgroundColor:
+        activeId === msg.id
+          ? '#45475a'
+          : hoverId === msg.id
+          ? '#3a3a3a'
+          : 'transparent'
+    }}
+  >
+    {/* title */}
+    <span
+      style={{
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {msg.title}
+    </span>
+
+    {/* Date */}
+    <span
+      style={{
+        fontSize: '0.75rem',
+        opacity: hoverId === msg.id ? 0.9 : 0.6,
+        marginLeft: '0.5rem',
+        flexShrink: 0,
+      }}
+    >
+      {formatDate(msg.created_at)}
+    </span>
+  </div>
+))}
     </div>
   );
 };
@@ -124,7 +183,39 @@ useEffect(() => {
   return <p style={{ opacity: 0.6 }}>No matching chats</p>;
 }
   return (
-    <div style={{ marginTop: '1rem', overflowY: 'auto', maxHeight: '80%' }}>
+  <>
+    <style>
+      {`
+        .history-scroll {
+          overflow-y: auto;
+        }
+
+.history-scroll::-webkit-scrollbar {
+  width: 10px;
+  background: transparent;
+}
+        .history-scroll::-webkit-scrollbar-track {
+          background: transparent;
+        }
+
+        .history-scroll::-webkit-scrollbar-thumb {
+          background-color: #cba6f786;
+          border-radius: 10px;
+        }
+
+        .history-scroll::-webkit-scrollbar-thumb:hover {
+          background-color: #cba6f7e5;
+        }
+      `}
+    </style>
+
+    <div className="history-scroll" style={{ 
+      marginTop: '1rem',
+      maxHeight: 'calc(100vh - 120px)',
+      overflowY: 'auto',
+    paddingRight: '8px'
+       }}>
+
       
       <Section
         title="Today"
@@ -172,6 +263,7 @@ useEffect(() => {
       />
 
     </div>
+    </>
   );
 };
 

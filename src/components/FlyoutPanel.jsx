@@ -37,6 +37,8 @@ const [searchQuery, setSearchQuery] = useState("");
           zIndex: 1001, // above overlay
           padding: '1.5rem',
           boxShadow: '2px 0 10px rgba(0,0,0,0.3)',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
         {/* Optional close button inside panel */}
@@ -51,6 +53,7 @@ const [searchQuery, setSearchQuery] = useState("");
             color: 'white',
             fontSize: '1.2rem',
             cursor: 'pointer',
+            zIndex: 10,
           }}
         >
           ✕
@@ -115,8 +118,9 @@ const [searchQuery, setSearchQuery] = useState("");
               padding: '0.75rem',borderRadius: '8px',
               fontWeight: 'bold',
               cursor: 'pointer',
-              width: searchMode ? '50px' : '70%',
-              transition: 'all 0.25s ease',
+              flex: searchMode ? 1 : 3,
+              minWidth: '50px',
+              transition: 'flex 0.25s ease',
             }}
             onClick={() => {onOpenChat({messages: [],conversationId: null});
               onClose();
@@ -126,7 +130,12 @@ const [searchQuery, setSearchQuery] = useState("");
               </button>
               {/* SEARCH*/}
                {searchMode ? (
-                <div style={{ position: 'relative', flex: 1 }}>
+                <div  style={{    position: 'relative',
+                  flex: searchMode ? 3 : 1,
+                  marginRight: '1rem',
+                  transition: 'flex 0.25s ease',
+                   }}
+>
                   {/* 🔍 icon inside */}
                   <span
                   style={{
@@ -158,27 +167,30 @@ const [searchQuery, setSearchQuery] = useState("");
                    </div>
                    ) : (
                    <button
-                   style={{backgroundColor: '#4f4f4f',
-                    color: '#ffffffbd',
-                    border: 'none',
-                    padding: '0.75rem',
-                    width: '50px',
-                    borderRadius: '8px',
-                    cursor: 'text',
-                    transition: 'all 0.2s ease',
-                  }}
+                   style={{
+                  backgroundColor: '#4f4f4f',
+                  color: '#ffffffbd',
+                  border: 'none',
+                  padding: '0.75rem',
+                  flex: searchMode ? 3 : 1,
+                  minWidth: '50px',
+                  borderRadius: '8px',
+                  cursor: 'text',
+                  transition: 'flex 0.25s ease',
+                  marginRight: '1rem',
+                }}
                   onClick={() => setSearchMode(true)}
                   >🔍
                   </button>
                 )}
-                </div>                    
-             <div>
-              < History 
-                   username={username}
-                   isOpen={isOpen}
-                   refreshHistory={refreshHistory}
-                   searchQuery={searchQuery}
-                   onSelectConversation={async (id) => {
+                </div>
+                <div style={{ flex: 1, overflow: 'hidden' }}>
+                  <History 
+                  username={username}
+                  isOpen={isOpen}
+                  refreshHistory={refreshHistory}
+                  searchQuery={searchQuery}
+                  onSelectConversation={async (id) => {
                     try {
                       const res = await fetch(`http://localhost:3001/api/conversation/${id}`);
                       const raw = await res.json();
@@ -186,7 +198,8 @@ const [searchQuery, setSearchQuery] = useState("");
                       .slice(1)
                       .map(msg => ({
                         role: msg.role,
-                        content: msg.content}));
+                        content: msg.content
+                      }));
                       onOpenChat({
                         messages: cleanedMessages,
                         conversationId: id
@@ -194,10 +207,8 @@ const [searchQuery, setSearchQuery] = useState("");
                       onClose();
                     } catch (err) {
                       console.error("Failed to load conversation", err);
-                    }
-                  }}
-                    />
-            </div>
+                    }}}
+                    /></div>
           </>
         )}
      </div>
