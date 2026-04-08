@@ -1,30 +1,31 @@
 import React, { useState } from 'react';
 
-const PromptInput = ({ onSend }) => {
+const PromptInput = ({ onSend, loading = false, error = '' }) => {
   const [prompt, setPrompt] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (!prompt.trim()) return;
-
-    onSend(prompt);   //onSend
+    onSend(prompt);   
     setPrompt('');
   };
 
   return (
-    <form onSubmit={handleSubmit} className="prompt-form">
-      <input
-        type="text"
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-        placeholder="Ask me anything..."
-        className="prompt-input"
-      />
-      <button type="submit" className="prompt-submit">
-        Send
-      </button>
-    </form>
+    <div>
+      <form onSubmit={handleSubmit} className="prompt-form">
+        <input
+          type="text"
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder="Ask me anything..."
+          className="prompt-input"
+          disabled={loading}
+        />
+        <button type="submit" className="prompt-submit" disabled={loading}>
+          {loading ? 'Sending...' : 'Send'}
+        </button>
+      </form>
+      {error && <div className="error-message">{error}</div>}
+    </div>
   );
 };
 

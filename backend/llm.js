@@ -5,7 +5,7 @@ export async function callLLM(prompt) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'llama3',
+        model: 'gemma3:270m',
         prompt: prompt,
         stream: false
       })
@@ -19,3 +19,4 @@ export async function callLLM(prompt) {
     throw new Error('LLM failed');
   }
 }
+

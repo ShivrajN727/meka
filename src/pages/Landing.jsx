@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HamburgerMenu from '../components/HamburgerMenu';
 import AccountIcon from '../components/AccountIcon';
 import Greeting from '../components/Greeting';
@@ -6,169 +6,154 @@ import PromptInput from '../components/PromptInput';
 import AIOutput from '../components/AIOutput';
 import FlyoutPanel from '../components/FlyoutPanel';
 import AuthModal from '../components/AuthModal';
-
-
 import './Landing.css';
+
+
 
 const Landing = () => {
   const [isFlyoutOpen, setIsFlyoutOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [username, setUsername] = useState(''); 
-  const [refreshHistory, setRefreshHistory] = useState(0);
+  const [username, setUsername] = useState('');
   const [messages, setMessages] = useState([]);
   const [conversationId, setConversationId] = useState(null);
+  const [refreshHistory, setRefreshHistory] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  
 
-  const openChat = ({ messages, conversationId }) => {
-  setMessages(messages);
-  setConversationId(conversationId);
-};
+  // Restore session on page load
+  useEffect(() => {
+    const storedUser = localStorage.getItem('username');
+    if (storedUser) {
+      setIsLoggedIn(true);
+      setUsername(storedUser);
+      setRefreshHistory(prev => prev + 1); 
+    }
+  }, []);
+
+  // Load conversation history when logged in or refreshHistory changes
+  useEffect(() => {
+    console.log('Loading history, isLoggedIn:', isLoggedIn, 'username:', username);
+    if (!isLoggedIn || !username) return;
+    const loadHistory = async () => {
+      try {
+        const res = await fetch(`http://localhost:3001/api/history?username=${username}`);
+        const conversations = await res.json();
+        if (conversations.length > 0) {
+          const last = conversations[0];
+          setConversationId(last.id);
+          const msgRes = await fetch(`http://localhost:3001/api/conversation/${last.id}`);
+          const msgs = await msgRes.json();
+          setMessages(msgs);
+        } else {
+          setMessages([]);
+          setConversationId(null);
+        }
+      } catch (err) {
+        console.error('Failed to load history', err);
+      }
+    };
+    loadHistory();
+  }, [isLoggedIn, username, refreshHistory]);
 
   const toggleFlyout = () => setIsFlyoutOpen(!isFlyoutOpen);
+  const openAuthModal = () => setIsAuthModalOpen(true);
+  const closeAuthModal = () => setIsAuthModalOpen(false);
 
-  const openAuthModal = () => {
-    setIsAuthModalOpen(true);
-  };
-  const closeAuthModal = () => {
-    setIsAuthModalOpen(false);
-  };
-
-
-const handleLoginSuccess = async (userData) => {
-  console.log('Login successful:', userData);
-  setIsLoggedIn(true);
-  setUsername(userData.username);
-
-  if (!messages.length || conversationId) {
+  const handleLoginSuccess = (userData) => {
+    setIsLoggedIn(true);
+    setUsername(userData.username);
+    localStorage.setItem('username', userData.username);
+    // Force history reload
     setRefreshHistory(prev => prev + 1);
-    return;
-  }
+  };
 
-  try {
-    const res = await fetch("http://localhost:3001/api/conversation", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: userData.username,
-        messages,
-      }),
-    });
-
-    const data = await res.json();
-
-    if (data.conversationId) {
-      setConversationId(data.conversationId);
-      setRefreshHistory(prev => prev + 1);
-    }
-
-  } catch (err) {
-    console.error("Save failed:", err);
-  }
-};
-
-const handleLogout = () => {
-  setIsLoggedIn(false);
-  setUsername('');
-  setConversationId(null);
-  setMessages([]);
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setUsername('');
+    setMessages([]);
+    setConversationId(null);
+    localStorage.removeItem('username');
     window.location.reload();
-  }
+  };
 
-
-
-const handleSend = async (prompt) => {
-  const newMessages = [
-    ...messages,
-    { role: "user", content: prompt }
-  ];
-
-  setMessages(newMessages);
-
-  try {
-    const body = {
-      prompt,
-      username: isLoggedIn ? username : null,
-      conversationId: isLoggedIn ? conversationId : null,
-      ...(isLoggedIn && !conversationId && { messages: messages }),
-    };
-    const res = await fetch("http://localhost:3001/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-    setRefreshHistory(prev => prev + 1);
-    const data = await res.json();
-    setMessages(prev => [
-      ...prev,
-      { role: "ai", content: data.response || "Error: no response" }
-    ]);
-
-    if (isLoggedIn && data.conversationId && !conversationId) {
-      setConversationId(data.conversationId);
-      setRefreshHistory(prev => prev + 1);
+  const handleSend = async (prompt) => {
+    if (!prompt.trim()) {
+      setError('Please enter a message');
+      return;
     }
+    setError('');
+    setLoading(true);
 
-  } catch (err) {
-    console.error("Auto save failed:", err);
-    setMessages(prev => [
-      ...prev,
-      { role: "ai", content: "Error getting response" }
-    ]);
-  }
-};
+    // Optimistically add user message
+    setMessages(prev => [...prev, { role: 'user', content: prompt }]);
 
+    try {
+      const body = {
+        prompt,
+        username: isLoggedIn ? username : null,
+        conversationId: isLoggedIn ? conversationId : null,
+      };
+      const res = await fetch('http://localhost:3001/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'LLM failed');
+
+      setMessages(prev => [...prev, { role: 'ai', content: data.response }]);
+      if (isLoggedIn && data.conversationId && !conversationId) {
+        setConversationId(data.conversationId);
+      }
+      // Refresh history to update the side panel
+      setRefreshHistory(prev => prev + 1);
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+      // Optionally remove the optimistically added user message
+      setMessages(prev => prev.slice(0, -1));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openChat = ({ messages, conversationId }) => {
+    setMessages(messages);
+    setConversationId(conversationId);
+  };
 
   return (
     <div className="landing-container">
-      <FlyoutPanel 
-        isOpen={isFlyoutOpen} 
-        onClose={() => setIsFlyoutOpen(false)} 
+      <FlyoutPanel
+        isOpen={isFlyoutOpen}
+        onClose={() => setIsFlyoutOpen(false)}
         isLoggedIn={isLoggedIn}
         onLoginClick={openAuthModal}
         username={username}
         refreshHistory={refreshHistory}
         onOpenChat={openChat}
       />
-
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={closeAuthModal} 
-        onLoginSuccess={handleLoginSuccess}
-      />
-
+      <AuthModal isOpen={isAuthModalOpen} onClose={closeAuthModal} onLoginSuccess={handleLoginSuccess} />
       <header className="top-bar">
         <div className="top-left">
           <HamburgerMenu onClick={toggleFlyout} />
         </div>
-
         <div className="top-center">
-          <Greeting username={username}/>
-          <PromptInput onSend={handleSend} />
+          <Greeting username={username} />
+          <PromptInput onSend={handleSend} loading={loading} error={error} />
         </div>
-
         <div className="top-right">
-          <AccountIcon 
-            onLoginClick={openAuthModal}
-            onLogout={handleLogout}
-            isLoggedIn={isLoggedIn} 
-          />
+          <AccountIcon onLoginClick={openAuthModal} onLogout={handleLogout} isLoggedIn={isLoggedIn} />
         </div>
       </header>
-      {/*AI OUTPUT*/}
       <main className="ai-output-area">
         <AIOutput messages={messages} />
-      <img 
-        src="/meka-logo-reveal-prototype.gif"
-        className="logo-bottom"
-      />
       </main>
     </div>
   );
 };
 
 export default Landing;
-

@@ -2,11 +2,16 @@ import express from 'express';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
 import db from './database.js';
+import ollama from 'ollama';
 import { callLLM } from './llm.js';
 
 const app = express();
 app.use(cors()); 
 app.use(express.json());
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
 
 // Registration endpoint
 app.post('/api/register', async (req, res) => {
