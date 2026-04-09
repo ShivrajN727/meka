@@ -37,6 +37,9 @@ const Landing = () => {
   useEffect(() => {
     console.log('Loading history, isLoggedIn:', isLoggedIn, 'username:', username);
     if (!isLoggedIn || !username) return;
+    //avoid bug overlay
+    if (messages.length > 0) return;
+
     const loadHistory = async () => {
       try {
         const res = await fetch(`http://localhost:3001/api/history?username=${username}`);
