@@ -2,8 +2,12 @@ import express from 'express';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
 import db from './database.js';
-import ollama from 'ollama';
-import { callLLM } from './llm.js';
+import { callMultipleLLMs } from './llm.js';
+import {
+  OLLAMA_BASE_URL,
+  collectOllamaHostsForTags,
+  getRoutedOllamaModelNames
+} from './ollamaConfig.js';
 
 const app = express();
 app.use(cors()); 
@@ -11,6 +15,48 @@ app.use(express.json());
 
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+// List models from default Ollama plus any hosts declared in OLLAMA_MODEL_BASES (merged, deduped).
+app.get('/api/ollama/models', async (req, res) => {
+  const hosts = collectOllamaHostsForTags();
+  const names = new Set();
+  const hostErrors = [];
+
+  for (const base of hosts) {
+    try {
+      const r = await fetch(`${base}/api/tags`);
+      if (!r.ok) {
+        hostErrors.push(`${base}: HTTP ${r.status}`);
+        continue;
+      }
+      const data = await r.json();
+      for (const m of data.models || []) {
+        if (m.name) names.add(m.name);
+      }
+    } catch (e) {
+      hostErrors.push(`${base}: ${e.message}`);
+    }
+  }
+
+  const models = [...names].sort();
+  const routedModels = getRoutedOllamaModelNames();
+
+  if (models.length === 0) {
+    return res.status(502).json({
+      error:
+        hostErrors.join('; ') ||
+        `Ollama is not reachable. Tried: ${hosts.join(', ')}`,
+      models: [],
+      routedModels
+    });
+  }
+
+  res.json({
+    models,
+    routedModels,
+    ...(hostErrors.length ? { hostWarnings: hostErrors } : {})
+  });
 });
 
 // Registration endpoint
@@ -69,7 +115,7 @@ app.post('/api/login', (req, res) => {
 
 //chat end point
 app.post('/api/chat', async (req, res) => {
-  const { prompt, username, conversationId, messages } = req.body;
+  const { prompt, username, conversationId, messages, selectedModels } = req.body;
 
   if (!prompt&& (!messages || messages.length === 0)) {
     return res.status(400).json({ error: 'Prompt is required' });
@@ -104,21 +150,39 @@ app.post('/api/chat', async (req, res) => {
       });
     }
 
-//waitfor ai
-    const response = await callLLM(prompt);
-//save ai messave
-    if (username) {
-      await new Promise((resolve, reject) => {
-        db.run(
-          `INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?)`,
-          [currentConversationId, 'ai', response],
-          (err) => (err ? reject(err) : resolve())
-        );
+    // wait for AI responses from all selected models in parallel
+    const responses = await callMultipleLLMs(prompt, selectedModels);
+    const successfulResponses = responses.filter((item) => !item.error && item.response);
+
+    if (successfulResponses.length === 0) {
+      const firstErr = responses.find((item) => item.error)?.error;
+      return res.status(500).json({
+        error: firstErr || 'All selected models failed',
+        responses
       });
     }
 
+//save ai message(s)
+    if (username) {
+      for (const item of successfulResponses) {
+        const content = successfulResponses.length > 1
+          ? `[${item.model}] ${item.response}`
+          : item.response;
+
+        // Save each successful model output as a separate AI message.
+        await new Promise((resolve, reject) => {
+          db.run(
+            `INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?)`,
+            [currentConversationId, 'ai', content],
+            (err) => (err ? reject(err) : resolve())
+          );
+        });
+      }
+    }
+
     return res.json({
-      response,
+      response: successfulResponses[0].response,
+      responses,
       conversationId: currentConversationId
     });
 

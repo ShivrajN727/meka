@@ -1,4 +1,4 @@
-// Mock CSS imports – MUST come before Babel register
+// Mock CSS imports
 const Module = require('module');
 if (!Module._extensions['.css']) {
   Module._extensions['.css'] = function(module, filename) {
@@ -9,7 +9,7 @@ if (!Module._extensions['.css']) {
 // Register Babel to transpile JSX and ES modules to CommonJS
 require('@babel/register')({
   presets: [
-    ['@babel/preset-env', { modules: 'commonjs' }], // transforms import to require
+    ['@babel/preset-env', { modules: 'commonjs' }],
     '@babel/preset-react'
   ],
   extensions: ['.js', '.jsx', '.cjs']
@@ -27,13 +27,13 @@ global.window = dom.window;
 global.document = dom.window.document;
 global.navigator = dom.window.navigator;
 
-// Default fetch that rejects (simulates network error)
-const defaultFetch = () => Promise.reject(new Error('Network error (default mock)'));
+// ===== ADD THIS BLOCK =====
+// Polyfill fetch for tests (jsdom doesn't provide it)
+const fetch = require('node-fetch');
+global.window.fetch = fetch;
+global.fetch = fetch;
+// ==========================
 
-global.fetch = defaultFetch;
-global.window.fetch = defaultFetch;
 // Make React Testing Library's screen available globally (optional)
 const { screen } = require('@testing-library/react');
 global.screen = screen;
-
-console.log('Test helper loaded, fetch defined:', typeof global.window.fetch);

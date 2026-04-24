@@ -82,7 +82,7 @@ const Landing = () => {
     window.location.reload();
   };
 
-  const handleSend = async (prompt) => {
+  const handleSend = async (prompt, selectedModels = []) => {
     if (!prompt.trim()) {
       setError('Please enter a message');
       return;
@@ -98,6 +98,7 @@ const Landing = () => {
         prompt,
         username: isLoggedIn ? username : null,
         conversationId: isLoggedIn ? conversationId : null,
+        selectedModels,
       };
       const res = await fetch('http://localhost:3001/api/chat', {
         method: 'POST',
@@ -107,7 +108,24 @@ const Landing = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'LLM failed');
 
-      setMessages(prev => [...prev, { role: 'ai', content: data.response }]);
+      const rawResponses = Array.isArray(data.responses) ? data.responses : [];
+
+      if (rawResponses.length > 0) {
+        setMessages((prev) => [
+          ...prev,
+          ...rawResponses.flatMap((item) => {
+            if (item.error) {
+              return [{ role: 'ai', model: item.model, content: '', error: item.error }];
+            }
+            if (item.response) {
+              return [{ role: 'ai', model: item.model, content: item.response }];
+            }
+            return [];
+          })
+        ]);
+      } else {
+        setMessages(prev => [...prev, { role: 'ai', content: data.response }]);
+      }
       if (isLoggedIn && data.conversationId && !conversationId) {
         setConversationId(data.conversationId);
       }
@@ -126,6 +144,38 @@ const Landing = () => {
   const openChat = ({ messages, conversationId }) => {
     setMessages(messages);
     setConversationId(conversationId);
+  };
+
+  const keepResponse = (clickedIndex) => {
+    setMessages(prev => {
+      // Find the nearest user message before the clicked AI
+      let userMsgIndex = -1;
+      for (let i = clickedIndex - 1; i >= 0; i--) {
+        if (prev[i].role === 'user') {
+          userMsgIndex = i;
+          break;
+        }
+      }
+      if (userMsgIndex === -1) return prev; // safety, shouldn't happen
+  
+      // Keep:
+      // - All messages before and including that user message (previous turns intact)
+      // - The clicked AI response
+      // - Any user messages after that user message (future turns – their AI responses will be managed separately)
+      // - Any AI responses that are from previous turns (indices < userMsgIndex) are already kept
+      const newMessages = prev.filter((msg, idx) => {
+        // Keep all messages up to and including the user message that prompted this AI
+        if (idx <= userMsgIndex) return true;
+        // Keep the clicked AI response
+        if (idx === clickedIndex) return true;
+        // Keep any future user messages (they start new turns)
+        if (msg.role === 'user') return true;
+        // Remove all other AI messages that come after the user message
+        return false;
+      });
+  
+      return newMessages;
+    });
   };
 
   return (
@@ -153,7 +203,7 @@ const Landing = () => {
         </div>
       </header>
       <main className="ai-output-area">
-        <AIOutput messages={messages} />
+        <AIOutput messages={messages} onKeepResponse={keepResponse} />
       </main>
     </div>
   );

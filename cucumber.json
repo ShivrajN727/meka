@@ -5,7 +5,6 @@
       "support/*.cjs"
     ],
     "format": ["progress"],
-    "paths": ["features/"],
     "publishQuiet": true
   }
 }

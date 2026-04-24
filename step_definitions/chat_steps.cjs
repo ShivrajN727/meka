@@ -154,6 +154,11 @@ Then('displayed in the correct order', async function () {
 });
 
 // ---------- Multiple messages order ----------
+Given('the visitor is on the chat page', async function () {
+  await this.page.goto('http://localhost:5173');
+  await this.page.waitForSelector('.prompt-input');
+});
+
 Given('multiple messages exist', async function () {
   await ensureChatPage(this.page);
   await this.page.type('.prompt-input', 'Message 1');
@@ -175,4 +180,86 @@ Then('they should appear in chronological order', async function () {
   const userMessages = messages.filter(msg => msg.includes('You:'));
   expect(userMessages[0]).toContain('Message 1');
   expect(userMessages[1]).toContain('Message 2');
+});
+
+When('the user selects models {string}, {string}, {string}', async function (m1, m2, m3) {
+  await this.page.goto('http://localhost:5173');
+  await this.page.waitForSelector('.prompt-input');
+
+  const models = [m1, m2, m3];
+  for (const model of models) {
+    const success = await this.page.evaluate((modelName) => {
+      const labels = Array.from(document.querySelectorAll('.model-option'));
+      const targetLabel = labels.find(label => label.textContent.trim() === modelName || label.textContent.includes(modelName));
+      if (!targetLabel) return false;
+      const checkbox = targetLabel.querySelector('input[type="checkbox"]');
+      if (checkbox && !checkbox.checked) {
+        checkbox.click();
+        return true;
+      } else if (checkbox && checkbox.checked) {
+        // Already checked – that's acceptable
+        return true;
+      }
+      // Fallback: click the label
+      targetLabel.click();
+      return true;
+    }, model);
+    if (!success) throw new Error(`Model checkbox for "${model}" not found`);
+  }
+});
+
+When('the user sends the prompt {string}', async function (promptText) {
+  await this.page.type('.prompt-input', promptText);
+  await this.page.click('.prompt-submit');
+});
+
+Then('the user should see {int} AI responses', async function (count) {
+  // Wait for the expected number of AI messages to appear
+  const result = await this.page.waitForFunction(
+    (expected) => {
+      const messages = Array.from(document.querySelectorAll('.chat-message'));
+      const aiMessages = messages.filter(m => m.textContent.includes('AI'));
+      return aiMessages.length === expected;
+    },
+    { timeout: 60000 },
+    count
+  );
+  expect(result).toBeTruthy();
+
+  // Verify the count again using evaluate (more robust)
+  const aiCount = await this.page.evaluate(() => {
+    const messages = Array.from(document.querySelectorAll('.chat-message'));
+    return messages.filter(m => m.textContent.includes('AI')).length;
+  });
+  expect(aiCount).toBe(count);
+});
+
+When('the user clicks on the AI response from {string}', async function (modelName) {
+  const clicked = await this.page.evaluate((modelName) => {
+    const messages = Array.from(document.querySelectorAll('.chat-message'));
+    const target = messages.find(msg => msg.textContent.includes(`AI (${modelName})`));
+    if (target) {
+      target.click();
+      return true;
+    }
+    return false;
+  }, modelName);
+  if (!clicked) throw new Error(`No AI response from ${modelName} found`);
+});
+
+Then('only the clicked AI response should remain', async function () {
+  // Wait until the number of AI messages reduces to exactly 1
+  await this.page.waitForFunction(
+    () => {
+      const messages = Array.from(document.querySelectorAll('.chat-message'));
+      const aiMessages = messages.filter(m => m.textContent.includes('AI'));
+      return aiMessages.length === 1;
+    },
+    { timeout: 10000 }
+  );
+  const aiCount = await this.page.evaluate(() => {
+    const messages = Array.from(document.querySelectorAll('.chat-message'));
+    return messages.filter(m => m.textContent.includes('AI')).length;
+  });
+  expect(aiCount).toBe(1);
 });

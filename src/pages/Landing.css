@@ -7,7 +7,7 @@
 html, body, #root {
     height: 100%;
     width: 100%;
-    background-color: var (--ctp-base);
+    background-color: var(--ctp-base);
 }
 
 button, input, textarea {
@@ -123,10 +123,140 @@ button, input, textarea {
   }
   
   /* Prompt form */
+  .prompt-input-stack {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
   .prompt-form {
     display: flex;
     width: 100%;
     gap: 0.5rem;
+  }
+
+  .model-selector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.25rem;
+    width: 100%;
+  }
+
+  .model-selector-heading {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ctp-subtext0);
+  }
+
+  .model-selector-sub {
+    font-size: 0.72rem;
+    line-height: 1.35;
+    color: var(--ctp-subtext1);
+    text-align: center;
+    max-width: 36rem;
+    padding: 0 0.25rem;
+  }
+
+  .model-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+
+  .model-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    color: var(--ctp-subtext1);
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--ctp-surface1);
+    background-color: var(--ctp-mantle);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .model-option:hover {
+    border-color: var(--ctp-surface2);
+    color: var(--ctp-text);
+  }
+
+  .model-option--selected {
+    border-color: var(--ctp-mauve);
+    background-color: var(--ctp-surface0);
+    color: var(--ctp-lavender);
+  }
+
+  .model-option-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .model-option-label {
+    font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace;
+    font-size: 0.78rem;
+  }
+
+  .model-note {
+    font-size: 0.8rem;
+    color: var(--ctp-peach);
+    text-align: center;
+    line-height: 1.35;
+  }
+
+  .model-install-hint {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--ctp-surface1);
+    background-color: var(--ctp-mantle);
+  }
+
+  .model-install-hint-title {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ctp-subtext0);
+    margin-bottom: 0.4rem;
+  }
+
+  .model-install-commands {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .model-install-cmd {
+    font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace;
+    font-size: 0.72rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    background-color: var(--ctp-base);
+    color: var(--ctp-teal);
+    border: 1px solid var(--ctp-surface0);
+  }
+
+  .error-message {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--ctp-red);
+    text-align: center;
   }
   
   .prompt-input {
@@ -166,9 +296,38 @@ button, input, textarea {
     min-height: 200px;
     color: var(--ctp-subtext1);
   }
+
+  .chat-message {
+    margin-bottom: 0.75rem;
+    line-height: 1.45;
+  }
+
+  .chat-message--error {
+    padding: 0.5rem 0.65rem;
+    border-radius: 8px;
+    border: 1px solid var(--ctp-maroon);
+    background-color: color-mix(in srgb, var(--ctp-red) 12%, var(--ctp-mantle));
+  }
+
+  .chat-message-error-body {
+    color: var(--ctp-red);
+    font-size: 0.92rem;
+  }
+
   .logo-bottom {
     display: block;
     margin: 2rem auto 0;
     width: 180px;
     opacity: 0.85;
+  }
+
+  .chat-message.clickable-ai {
+  transition: all 0.2s ease;
+  border-radius: 8px;  
+  }
+
+.chat-message.clickable-ai:hover {
+  background-color: var(--ctp-surface0);
+  box-shadow: 0 0 12px var(--ctp-mauve);  
+  cursor: pointer;
   }
