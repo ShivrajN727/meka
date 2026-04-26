@@ -5,7 +5,7 @@ export async function callLLM(prompt) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma3:270m',
+model: 'gemma3:4b',
         prompt: prompt,
         stream: false
       })

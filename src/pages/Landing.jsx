@@ -20,7 +20,7 @@ const Landing = () => {
   const [refreshHistory, setRefreshHistory] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+const [selectedModel, setSelectedModel] = useState('ollama');  
   
 
   // Restore session on page load
@@ -98,6 +98,7 @@ const Landing = () => {
         prompt,
         username: isLoggedIn ? username : null,
         conversationId: isLoggedIn ? conversationId : null,
+model: selectedModel,
       };
       const res = await fetch('http://localhost:3001/api/chat', {
         method: 'POST',
@@ -146,7 +147,7 @@ const Landing = () => {
         </div>
         <div className="top-center">
           <Greeting username={username} />
-          <PromptInput onSend={handleSend} loading={loading} error={error} />
+<PromptInput onSend={handleSend} loading={loading} error={error} selectedModel={selectedModel} onModelChange={setSelectedModel} />
         </div>
         <div className="top-right">
           <AccountIcon onLoginClick={openAuthModal} onLogout={handleLogout} isLoggedIn={isLoggedIn} />

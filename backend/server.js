@@ -5,6 +5,11 @@ import db from './database.js';
 import ollama from 'ollama';
 import { callLLM } from './llm.js';
 
+
+import { callGemini } from './gemini.js';
+import dotenv from 'dotenv';
+dotenv.config();
+
 const app = express();
 app.use(cors()); 
 app.use(express.json());
@@ -69,7 +74,7 @@ app.post('/api/login', (req, res) => {
 
 //chat end point
 app.post('/api/chat', async (req, res) => {
-  const { prompt, username, conversationId, messages } = req.body;
+  const { prompt, username, conversationId, messages, model } = req.body;
 
   if (!prompt&& (!messages || messages.length === 0)) {
     return res.status(400).json({ error: 'Prompt is required' });
@@ -105,7 +110,8 @@ app.post('/api/chat', async (req, res) => {
     }
 
 //waitfor ai
-    const response = await callLLM(prompt);
+    const response = model === 'gemini' ? await callGemini(prompt) : await callLLM(prompt);
+
 //save ai messave
     if (username) {
       await new Promise((resolve, reject) => {
