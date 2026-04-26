@@ -6,6 +6,15 @@ Requirements: Yiwen Cai
 Development: Shivraj Nath  
 Testing: Zohaib Ahmed, Muhammad Nazir
 
+# Team (iteration 2) 
+Requirements: Zohaib Ahmed, Muhammad Nazir
+Development: Yiwen Cai
+Testing: Shivraj Nath
+
+# Team (iteration 3)
+Requirements: Shivraj Nath
+Development: Zohaib Ahmed, Muhammad Nazir
+Testing: Yiwen Cai
 
 # Metadata
 **Application Name:** meka  
@@ -19,6 +28,12 @@ Testing: Zohaib Ahmed, Muhammad Nazir
 - Fly out panel  
 - Conversation History  
 - Search box
+
+## Core Features for Iteration 3: 
+- LLM Selector
+- Theme Selector
+- Accurate Information
+- LLM Recommendation 
 
 ## Tech Stack
 - **Frontend:** React
@@ -53,3 +68,14 @@ These stories deliver a basic interface with a landing page and user authenticat
 Total effort: 2+2+2+2+1+2 = 11 points.   
 These stories allow users to interact with the LLM and manage their conversation history.
 
+### Identified Stories for Iteration 3
+| # | User Story | Function | Points Assigned |
+|---|------------|----------|-----------------|
+| I | As a regular user, I want to select different backend LLMs, so I can get a response that may be more accurate. | Selected LLMs | 2 |
+| J1 | As a mathematical user, I want to be able to get accurate responses to math questions from the LLM, so I can solve problems. | Computation | 1 | 
+| J2 | As a practical user, I want to be able to ask about the weather in my location to the LLM, so I can find out quickly and conveniently. | Factual Lookup | 1 |
+| K | As an expressive user, I want to be able to change the theme of the website through the LLM, so that the site can cater to my visual needs. | Customization | 2 | 
+| L | As a regular user, I want the website to suggest what the best LLM is based on my question, so that I’m given the most accurate information. | Reccomendation | 3 |
+
+Total effort: 2 + 1 + 1 + 2 + 3 = 9 points
+These stories fine tunes the service to be as accurate as possible. 
