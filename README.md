@@ -77,5 +77,5 @@ These stories allow users to interact with the LLM and manage their conversation
 | K | As an expressive user, I want to be able to change the theme of the website through the LLM, so that the site can cater to my visual needs. | Customization | 2 | 
 | L | As a regular user, I want the website to suggest what the best LLM is based on my question, so that I’m given the most accurate information. | Reccomendation | 3 |
 
-Total effort: 2 + 1 + 1 + 2 + 3 = 9 points
+Total effort: 2 + 1 + 1 + 2 + 3 = 9 points.
 These stories fine tunes the service to be as accurate as possible. 
