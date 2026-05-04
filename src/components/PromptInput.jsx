@@ -1,16 +1,31 @@
 import React, { useState } from 'react';
 
-const PromptInput = ({ onSend, loading = false, error = '' }) => {
+const MODELS = [
+{ value: 'ollama', label: 'gemma3:4b (Local)' },
+  { value: 'gemini', label: 'Gemini 2.0 Flash (Public)' },
+];
+
+const PromptInput = ({ onSend, loading = false, error = '', selectedModel, onModelChange }) => {
   const [prompt, setPrompt] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSend(prompt);   
+    onSend(prompt);
     setPrompt('');
   };
 
   return (
     <div>
+      <select
+        value={selectedModel}
+        onChange={(e) => onModelChange(e.target.value)}
+        className="model-selector"
+        disabled={loading}
+      >
+        {MODELS.map((m) => (
+          <option key={m.value} value={m.value}>{m.label}</option>
+        ))}
+      </select>
       <form onSubmit={handleSubmit} className="prompt-form">
         <input
           type="text"

@@ -8,8 +8,6 @@ import FlyoutPanel from '../components/FlyoutPanel';
 import AuthModal from '../components/AuthModal';
 import './Landing.css';
 
-
-
 const Landing = () => {
   const [isFlyoutOpen, setIsFlyoutOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -20,24 +18,26 @@ const Landing = () => {
   const [refreshHistory, setRefreshHistory] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  
+  const [selectedModel, setSelectedModel] = useState('ollama');
+  const [theme, setTheme] = useState('dark');
 
-  // Restore session on page load
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    document.documentElement.className = newTheme === 'light' ? 'theme-light' : '';
+  };
+
   useEffect(() => {
     const storedUser = localStorage.getItem('username');
     if (storedUser) {
       setIsLoggedIn(true);
       setUsername(storedUser);
-      setRefreshHistory(prev => prev + 1); 
+      setRefreshHistory(prev => prev + 1);
     }
   }, []);
 
-  // Load conversation history when logged in or refreshHistory changes
   useEffect(() => {
-    console.log('Loading history, isLoggedIn:', isLoggedIn, 'username:', username);
     if (!isLoggedIn || !username) return;
-    //avoid bug overlay
     if (messages.length > 0) return;
 
     const loadHistory = async () => {
@@ -69,7 +69,6 @@ const Landing = () => {
     setIsLoggedIn(true);
     setUsername(userData.username);
     localStorage.setItem('username', userData.username);
-    // Force history reload
     setRefreshHistory(prev => prev + 1);
   };
 
@@ -90,7 +89,6 @@ const Landing = () => {
     setError('');
     setLoading(true);
 
-    // Optimistically add user message
     setMessages(prev => [...prev, { role: 'user', content: prompt }]);
 
     try {
@@ -98,6 +96,7 @@ const Landing = () => {
         prompt,
         username: isLoggedIn ? username : null,
         conversationId: isLoggedIn ? conversationId : null,
+        model: selectedModel,
       };
       const res = await fetch('http://localhost:3001/api/chat', {
         method: 'POST',
@@ -111,12 +110,10 @@ const Landing = () => {
       if (isLoggedIn && data.conversationId && !conversationId) {
         setConversationId(data.conversationId);
       }
-      // Refresh history to update the side panel
       setRefreshHistory(prev => prev + 1);
     } catch (err) {
       console.error(err);
       setError(err.message);
-      // Optionally remove the optimistically added user message
       setMessages(prev => prev.slice(0, -1));
     } finally {
       setLoading(false);
@@ -146,9 +143,12 @@ const Landing = () => {
         </div>
         <div className="top-center">
           <Greeting username={username} />
-          <PromptInput onSend={handleSend} loading={loading} error={error} />
+          <PromptInput onSend={handleSend} loading={loading} error={error} selectedModel={selectedModel} onModelChange={setSelectedModel} />
         </div>
-        <div className="top-right">
+        <div className="top-right" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <button onClick={toggleTheme} className="prompt-submit">
+            {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
+          </button>
           <AccountIcon onLoginClick={openAuthModal} onLogout={handleLogout} isLoggedIn={isLoggedIn} />
         </div>
       </header>
@@ -160,3 +160,4 @@ const Landing = () => {
 };
 
 export default Landing;
+
