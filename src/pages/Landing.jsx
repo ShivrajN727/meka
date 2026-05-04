@@ -60,7 +60,7 @@ const Landing = () => {
       }
     };
     loadHistory();
-  }, [isLoggedIn, username, refreshHistory]);
+  }, [isLoggedIn, username, refreshHistory, messages.length]);
 
   const toggleFlyout = () => setIsFlyoutOpen(!isFlyoutOpen);
   const openAuthModal = () => setIsAuthModalOpen(true);
