@@ -21,3 +21,13 @@ Added hover interaction for conversation items
 Implemented scrollable chat history panel
 
 Feature H: Continue Conversation. Updates in #7 (Apr.2.2026)
+
+
+
+Feature: Weather Query (detects weather questions and fetches live data from Open-Meteo API).
+=======
+Feature: Theme Picker (light/dark mode toggle)
+
+
+
+>>> origin/main

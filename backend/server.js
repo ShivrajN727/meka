@@ -102,6 +102,11 @@ app.post('/api/chat', async (req, res) => {
       response = await callGemini(prompt);
     } else {
       response = await callLLM(prompt);
+    const weatherMatch = prompt.match(/weather\s+(?:in\s+)?(.+)/i);
+    if (weatherMatch) {
+      response = await getWeather(weatherMatch[1].trim());
+    } else {
+      response = model === 'gemini' ? await callGemini(prompt) : await callLLM(prompt);
     }
 
     if (username) {
@@ -115,6 +120,7 @@ app.post('/api/chat', async (req, res) => {
     }
 
     return res.json({ response, conversationId: currentConversationId, queryType });
+    return res.json({ response, conversationId: currentConversationId });
 
   } catch (err) {
     console.error(err);
