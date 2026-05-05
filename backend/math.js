@@ -1,27 +1,35 @@
 export function classifyQuery(prompt) {
   if (!prompt || prompt.trim() === '') return 'unknown';
-  
+
+  const input = prompt.toLowerCase().trim();
+
+
+  if (/^\d+\s*[\+\-\*\/]\s*\d+/.test(input)) {
+    return 'math_simple';
+  }
+
+
+  if (/x\^2/.test(input)) {
+    return 'math_quadratic';
+  }
+
+
+  if (/^\d*x[\+\-]\d+=\d+/.test(input)) {
+    return 'math_linear';
+  }
+
+
   const mathKeywords = [
-    'solve', 'calculate', 'integrate', 'derivative', 'equation',
-    'algebra', 'geometry', 'calculus', 'matrix', 'vector',
-    'factor', 'simplify', 'expand', 'polynomial', 'quadratic',
-    'trigonometry', 'sin', 'cos', 'tan', 'logarithm', 'exponent',
-    'multiply', 'divide', 'subtract', 'fraction', 'percentage',
-    'prime', 'fibonacci', 'factorial', 'permutation', 'combination'
+    'solve', 'calculate', 'integrate', 'derivative',
+    'algebra', 'geometry', 'calculus', 'matrix',
+    'vector', 'log', 'sin', 'cos', 'tan', 'limit'
   ];
 
-  const mathPatterns = [
-    /\d+\s*[\+\-\*\/\^]\s*\d+/,
-    /x\s*[\+\-\*\/\^]/,
-    /\d+x/,
-    /sqrt|log|ln|lim|sum|integral/i
-  ];
+  const keywordMatch = mathKeywords.some(k =>
+    new RegExp(`\\b${k}\\b`, 'i').test(prompt)
+  );
 
-  const lowerPrompt = prompt.toLowerCase();
-  
-  if (mathKeywords.some(k => lowerPrompt.includes(k))) return 'math';
-  if (mathPatterns.some(p => p.test(prompt))) return 'math';
-  
+  if (keywordMatch) return 'math_complex';
+
   return 'general';
 }
-

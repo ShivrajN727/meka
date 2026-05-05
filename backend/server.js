@@ -8,6 +8,7 @@ import { callGemini } from './gemini.js';
 import { getWeather } from './weather.js';
 import { classifyQuery } from './math.js';
 import dotenv from 'dotenv';
+import { solveMath } from './mathSolver.js';
 dotenv.config();
 
 const app = express();
@@ -96,13 +97,21 @@ app.post('/api/chat', async (req, res) => {
     const queryType = classifyQuery(prompt);
     const weatherMatch = prompt.match(/weather\s+(?:in\s+)?(.+)/i);
 
-    if (weatherMatch) {
+   if (weatherMatch) {
       response = await getWeather(weatherMatch[1].trim());
     } else if (model === 'gemini') {
-      response = await callGemini(prompt);
-    } else {
-      response = await callLLM(prompt);
-    }
+      response = await callGemini(prompt);}
+    else if (queryType === 'math_simple'||queryType === 'math_quadratic'||queryType === 'math_linear') {
+      response = solveMath(prompt, queryType);}
+      else if (queryType === 'math_complex') {
+        response = await callGemini(prompt);}
+     else{ response = await callLLM(prompt);}
+    
+
+    if (!response) {
+  console.error("LLM returned empty response");
+  response = "Model failed to respond";
+}
 
     if (username) {
       await new Promise((resolve, reject) => {

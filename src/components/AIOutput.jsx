@@ -11,10 +11,12 @@ const AIOutput = ({ messages }) => {
   return (
     <div className="ai-output">
       {messageList.map((msg, idx) => (
-        <div key={idx} className="chat-message">
-          <strong>{msg.role === 'user' ? 'You: ' : 'AI: '}</strong>
-          {msg.content}
-        </div>
+<div key={idx} className="chat-message">
+  <strong>{msg.role === 'user' ? 'You: ' : 'AI: '}</strong>
+  <span style={{ whiteSpace: 'pre-line' }}>
+    {msg.content}
+  </span>
+</div>
       ))}
     </div>
   );
