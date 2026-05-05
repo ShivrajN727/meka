@@ -1,3 +1,4 @@
+@theme
 Feature: Theme
 
 Scenario: Toggle from dark to light
