@@ -21,3 +21,21 @@ Added hover interaction for conversation items
 Implemented scrollable chat history panel
 
 Feature H: Continue Conversation. Updates in #7 (Apr.2.2026)
+
+Feature I: Theme Picker (Implemented in PR #19 and merged into main branch - May 4, 2026)
+Users can switch between dark mode and light mode themes through the UI.
+
+Feature J1: Mathematical Computation Support (Implemented in PR #23 and PR #24 - May 4, 2026)
+Implemented math query detection and mathematical computation handling.
+Math query detection passed testing in PR #23, though output generation issues remain under refinement.
+Added MathSolver.js backend implementation and related test features in PR #24.
+
+Feature J2: Weather Lookup (Implemented in PR #20 - May 4, 2026)
+Implemented factual weather lookup functionality through backend weather.js integration.
+
+Feature K: Model Selector (Implemented in PR #19 - May 3, 2026)
+Users can manually select different LLM models through the interface.
+
+Feature L: Model Recommendation (Partial Implementation in PR #24 with testing - May 5, 2026)
+Implemented partial model recommendation functionality to assist users in selecting appropriate models based on query type.
+
